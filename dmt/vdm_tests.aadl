@@ -1,0 +1,25 @@
+SUBPROGRAM mytestsubsystemEmpty
+END mytestsubsystemEmpty;
+
+SUBPROGRAM IMPLEMENTATION mytestsubsystemEmpty.Vdm
+PROPERTIES
+	FV_Name => "mytestsubsystemEmpty_fv_Vdm";
+	Source_Language => Vdm;
+END mytestsubsystemEmpty.Vdm;
+
+-- GUIs can't tolerate empty param set
+
+SUBPROGRAM mytestsubsystem
+FEATURES
+	my_in_AType:IN PARAMETER DataView::MInt {encoding=>UPER;};
+	my_out_TypeEnumerated:OUT PARAMETER DataView::MInt {encoding=>UPER;};
+
+END mytestsubsystem;
+
+
+SUBPROGRAM IMPLEMENTATION mytestsubsystem.Vdm
+PROPERTIES
+	FV_Name => "mytestsubsystem_fv_Simulink";
+	Source_Language => Vdm;
+END mytestsubsystem.Vdm;
+
