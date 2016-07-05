@@ -43,7 +43,7 @@ vdmBacked = None
 
 
 def Version():
-    print("Code generator: " + "$Id: vdm_B_mapper.py 2390 2012-07-19 12:39:17Z ttsiodras $")
+    print("Code generator: " + "$Id: vdm_B_mapper.py 2390 2015-07-04 12:39:17Z tfabbri $")
 
 
 # noinspection PyListCreation
@@ -60,13 +60,13 @@ class FromVDMToASN1SCC(RecursiveMapper):
         self.uniqueID -= 1
 
     def MapInteger(self, srcVDMVariable, destVar, _, __, ___):
-        return ["%s = (asn1SccSint) %s;\n" % (destVar, srcVDMVariable)]
+        return ["%s = (asn1SccSint) %s->value.intVal;\n" % (destVar, srcVDMVariable)]
+
+    def MapBoolean(self, srcVDMVariable, destVar, _, __, ___):
+        return ["%s = (%s->value.boolVal==TRUE)?0xff:0;\n" % (destVar, srcVDMVariable)]
 '''
     def MapReal(self, srcSDLVariable, destVar, _, __, ___):
         return ["%s = (double)%s;\n" % (destVar, srcSDLVariable)]
-
-    def MapBoolean(self, srcSDLVariable, destVar, _, __, ___):
-        return ["%s = (%s==TRUE)?0xff:0;\n" % (destVar, srcSDLVariable)]
 
     def MapOctetString(self, srcSDLVariable, destVar, node, __, ___):
         lines = []  # type: List[str]
@@ -146,7 +146,7 @@ class FromVDMToASN1SCC(RecursiveMapper):
 
 # noinspection PyListCreation
 # pylint: disable=no-self-use
-class FromASN1SCCtoRTDS(RecursiveMapper):
+class FromASN1SCCtoVDM(RecursiveMapper):
     def __init__(self):
         self.uniqueID = 0
 
@@ -157,14 +157,14 @@ class FromASN1SCCtoRTDS(RecursiveMapper):
     def DecreaseUniqueID(self):
         self.uniqueID -= 1
 
-    def MapInteger(self, srcVar, dstSDLVariable, _, __, ___):
-        return ["%s = %s;\n" % (dstSDLVariable, srcVar)]
+    def MapInteger(self, srcVar, dstVDMVariable, _, __, ___):
+        return ["%s = newInt(%s);\n" % (dstVDMVariable, srcVar)]
+
+    def MapBoolean(self, srcVar, dstVDMVariable, _, __, ___):
+        return ["%s = (%s)?newBool(TRUE):newBool(FALSE);\n" % (dstVDMVariable, srcVar)]
 '''
     def MapReal(self, srcVar, dstSDLVariable, _, __, ___):
         return ["%s = %s;\n" % (dstSDLVariable, srcVar)]
-
-    def MapBoolean(self, srcVar, dstSDLVariable, _, __, ___):
-        return ["%s = (%s)?TRUE:FALSE;\n" % (dstSDLVariable, srcVar)]
 
     def MapOctetString(self, srcVar, dstSDLVariable, node, _, __):
         # for i in xrange(0, node._range[-1]):
@@ -249,19 +249,16 @@ class FromASN1SCCtoRTDS(RecursiveMapper):
 class VDM_GlueGenerator(ASynchronousToolGlueGenerator):
     def __init__(self):
         ASynchronousToolGlueGenerator.__init__(self)
-        self.FromRTDSToASN1SCC = FromRTDSToASN1SCC()
-        self.FromRTDSToOSS = FromRTDSToOSS()
-        self.FromASN1SCCtoRTDS = FromASN1SCCtoRTDS()
-        self.FromOSStoRTDS = FromOSStoRTDS()
+        self.FromVDMToASN1SCC = FromVDMToASN1SCC()
+        self.FromASN1SCCtoVDM = FromASN1SCCtoVDM()
 
     def Version(self):
-        print("Code generator: " + "$Id: rtds_B_mapper.py 2390 2012-07-19 12:39:17Z ttsiodras $")
+        print("Code generator: " + "$Id: vdm_B_mapper.py 2390 2015-07-04 12:39:17Z tfabbri $")
 
     def HeadersOnStartup(self, unused_asnFile, unused_outputDir, unused_maybeFVname):
         self.C_HeaderFile.write("#include <assert.h>\n\n")
         self.C_HeaderFile.write("#include \"%s.h\"\n" % self.asn_name)
-        self.C_HeaderFile.write("#include \"RTDS_gen.h\"\n\n")
-        self.C_HeaderFile.write("#include \"RTDSdataView.h\"\n\n")
+        self.C_HeaderFile.write("#include \"vdm2c/Vdm.h\"\n\n")
 
     def Encoder(self, nodeTypename, node, leafTypeDict, names, encoding):
         if encoding.lower() in ["uper", "acn"]:
@@ -273,23 +270,24 @@ class VDM_GlueGenerator(ASynchronousToolGlueGenerator):
             isPointer = False
         cleaned = self.CleanNameAsToolWants(nodeTypename)
         fileOutHeader.write(
-            "void Convert_%s_from_RTDS_to_ASN1SCC(asn1Scc%s *ptrASN1SCC, %s %sRTDS);\n" %
+            "void Convert_%s_from_VDM_to_ASN1SCC(asn1Scc%s *ptrASN1SCC, %s %sVDM);\n" %
             (cleaned, cleaned, cleaned, "*" if isPointer else ""))
         fileOutSource.write(
-            "void Convert_%s_from_RTDS_to_ASN1SCC(asn1Scc%s *ptrASN1SCC, %s %sRTDS)\n{\n" %
+            "void Convert_%s_from_VDM_to_ASN1SCC(asn1Scc%s *ptrASN1SCC, %s %sVDM)\n{\n" %
             (cleaned, cleaned, cleaned, "*" if isPointer else ""))
 
         # Write the mapping code for the message
         if self.useOSS:
-            lines = self.FromRTDSToOSS.Map(
-                "(%sRTDS)" % ("*" if isPointer else ""),
-                "(*ptrASN1SCC)",
-                node,
-                leafTypeDict,
-                names)
+            print('useOSS')
+            #lines = self.FromRTDSToOSS.Map(
+            #    "(%sVDM)" % ("*" if isPointer else ""),
+            #    "(*ptrASN1SCC)",
+            #    node,
+            #    leafTypeDict,
+            #    names)
         else:
-            lines = self.FromRTDSToASN1SCC.Map(
-                "(%sRTDS)" % ("*" if isPointer else ""),
+            lines = self.FromVDMToASN1SCC.Map(
+                "(%sVDM)" % ("*" if isPointer else ""),
                 "(*ptrASN1SCC)",
                 node,
                 leafTypeDict,
@@ -306,24 +304,25 @@ class VDM_GlueGenerator(ASynchronousToolGlueGenerator):
         fileOutSource = self.C_SourceFile
         cleaned = self.CleanNameAsToolWants(nodeTypename)
         fileOutHeader.write(
-            "void Convert_%s_from_ASN1SCC_to_RTDS(%s *ptrRTDS, const asn1Scc%s *ptrASN1SCC);\n" %
+            "void Convert_%s_from_ASN1SCC_to_VDM(%s *ptrVDM, const asn1Scc%s *ptrASN1SCC);\n" %
             (cleaned, cleaned, cleaned))
 
         fileOutSource.write(
-            "void Convert_%s_from_ASN1SCC_to_RTDS(%s *ptrRTDS, const asn1Scc%s *ptrASN1SCC)\n{\n" %
+            "void Convert_%s_from_ASN1SCC_to_VDM(%s *ptrVDM, const asn1Scc%s *ptrASN1SCC)\n{\n" %
             (cleaned, cleaned, cleaned))
 
         if self.useOSS:
-            lines = self.FromOSStoRTDS.Map(
-                "(*ptrASN1SCC)",
-                "(*ptrRTDS)",
-                node,
-                leafTypeDict,
-                names)
+            print('useOSS')
+        #    lines = self.FromOSStoRTDS.Map(
+        #        "(*ptrASN1SCC)",
+        #        "(*ptrVDM)",
+        #        node,
+        #        leafTypeDict,
+        #        names)
         else:
-            lines = self.FromASN1SCCtoRTDS.Map(
+            lines = self.FromASN1SCCtoVDM.Map(
                 "(*ptrASN1SCC)",
-                "(*ptrRTDS)",
+                "(*ptrVDM)",
                 node,
                 leafTypeDict,
                 names)
@@ -334,49 +333,49 @@ class VDM_GlueGenerator(ASynchronousToolGlueGenerator):
 
 
 def OnStartup(modelingLanguage, asnFile, outputDir, maybeFVname, useOSS):
-    global rtdsBackend
-    rtdsBackend = RTDS_GlueGenerator()
-    rtdsBackend.OnStartup(modelingLanguage, asnFile, outputDir, maybeFVname, useOSS)
+    global vdmBackend
+    vdmBackend = VDM_GlueGenerator()
+    vdmBackend.OnStartup(modelingLanguage, asnFile, outputDir, maybeFVname, useOSS)
     global cBackend
     cBackend = c_B_mapper.C_GlueGenerator()
     cBackend.OnStartup("C", asnFile, outputDir, maybeFVname, useOSS)
 
 
 def OnBasic(nodeTypename, node, leafTypeDict, names):
-    rtdsBackend.OnBasic(nodeTypename, node, leafTypeDict, names)
+    vdmBackend.OnBasic(nodeTypename, node, leafTypeDict, names)
     cBackend.OnBasic(nodeTypename, node, leafTypeDict, names)
 
 
 def OnSequence(nodeTypename, node, leafTypeDict, names):
-    rtdsBackend.OnSequence(nodeTypename, node, leafTypeDict, names)
+    vdmBackend.OnSequence(nodeTypename, node, leafTypeDict, names)
     cBackend.OnSequence(nodeTypename, node, leafTypeDict, names)
 
 
 def OnSet(nodeTypename, node, leafTypeDict, names):
-    rtdsBackend.OnSet(nodeTypename, node, leafTypeDict, names)  # pragma: nocover
+    vdmBackend.OnSet(nodeTypename, node, leafTypeDict, names)  # pragma: nocover
     cBackend.OnSet(nodeTypename, node, leafTypeDict, names)  # pragma: nocover
 
 
 def OnEnumerated(nodeTypename, node, leafTypeDict, names):
-    rtdsBackend.OnEnumerated(nodeTypename, node, leafTypeDict, names)
+    vdmBackend.OnEnumerated(nodeTypename, node, leafTypeDict, names)
     cBackend.OnEnumerated(nodeTypename, node, leafTypeDict, names)
 
 
 def OnSequenceOf(nodeTypename, node, leafTypeDict, names):
-    rtdsBackend.OnSequenceOf(nodeTypename, node, leafTypeDict, names)
+    vdmBackend.OnSequenceOf(nodeTypename, node, leafTypeDict, names)
     cBackend.OnSequenceOf(nodeTypename, node, leafTypeDict, names)
 
 
 def OnSetOf(nodeTypename, node, leafTypeDict, names):
-    rtdsBackend.OnSetOf(nodeTypename, node, leafTypeDict, names)  # pragma: nocover
+    vdmBackend.OnSetOf(nodeTypename, node, leafTypeDict, names)  # pragma: nocover
     cBackend.OnSetOf(nodeTypename, node, leafTypeDict, names)  # pragma: nocover
 
 
 def OnChoice(nodeTypename, node, leafTypeDict, names):
-    rtdsBackend.OnChoice(nodeTypename, node, leafTypeDict, names)
+    vdmBackend.OnChoice(nodeTypename, node, leafTypeDict, names)
     cBackend.OnChoice(nodeTypename, node, leafTypeDict, names)
 
 
 def OnShutdown(modelingLanguage, asnFile, maybeFVname):
-    rtdsBackend.OnShutdown(modelingLanguage, asnFile, maybeFVname)
+    vdmBackend.OnShutdown(modelingLanguage, asnFile, maybeFVname)
     cBackend.OnShutdown("C", asnFile, maybeFVname)
