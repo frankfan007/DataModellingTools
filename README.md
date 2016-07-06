@@ -23,6 +23,12 @@ Installation
     $ make mypy  # optional, type analysis with mypy
     $ pip3 install --user --upgrade .
 
+For developers
+--------------
+
+    $ pip3 install --user --upgrade --editable .
+
+
 Contents
 --------
 

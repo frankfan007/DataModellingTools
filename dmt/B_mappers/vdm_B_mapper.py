@@ -270,11 +270,11 @@ class VDM_GlueGenerator(ASynchronousToolGlueGenerator):
             isPointer = False
         cleaned = self.CleanNameAsToolWants(nodeTypename)
         fileOutHeader.write(
-            "void Convert_%s_from_VDM_to_ASN1SCC(asn1Scc%s *ptrASN1SCC, %s %sVDM);\n" %
-            (cleaned, cleaned, cleaned, "*" if isPointer else ""))
+            "void Convert_%s_from_VDM_to_ASN1SCC(asn1Scc%s *ptrASN1SCC, TVP %sVDM);\n" %
+            (cleaned, cleaned, "*" if isPointer else ""))
         fileOutSource.write(
-            "void Convert_%s_from_VDM_to_ASN1SCC(asn1Scc%s *ptrASN1SCC, %s %sVDM)\n{\n" %
-            (cleaned, cleaned, cleaned, "*" if isPointer else ""))
+            "void Convert_%s_from_VDM_to_ASN1SCC(asn1Scc%s *ptrASN1SCC, TVP %sVDM)\n{\n" %
+            (cleaned, cleaned, "*" if isPointer else ""))
 
         # Write the mapping code for the message
         if self.useOSS:
@@ -304,12 +304,12 @@ class VDM_GlueGenerator(ASynchronousToolGlueGenerator):
         fileOutSource = self.C_SourceFile
         cleaned = self.CleanNameAsToolWants(nodeTypename)
         fileOutHeader.write(
-            "void Convert_%s_from_ASN1SCC_to_VDM(%s *ptrVDM, const asn1Scc%s *ptrASN1SCC);\n" %
-            (cleaned, cleaned, cleaned))
+            "void Convert_%s_from_ASN1SCC_to_VDM(TVP *ptrVDM, const asn1Scc%s *ptrASN1SCC);\n" %
+            (cleaned, cleaned))
 
         fileOutSource.write(
-            "void Convert_%s_from_ASN1SCC_to_VDM(%s *ptrVDM, const asn1Scc%s *ptrASN1SCC)\n{\n" %
-            (cleaned, cleaned, cleaned))
+            "void Convert_%s_from_ASN1SCC_to_VDM(TVP *ptrVDM, const asn1Scc%s *ptrASN1SCC)\n{\n" %
+            (cleaned, cleaned))
 
         if self.useOSS:
             print('useOSS')
