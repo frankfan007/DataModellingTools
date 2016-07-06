@@ -63,11 +63,11 @@ class FromVDMToASN1SCC(RecursiveMapper):
         return ["%s = (asn1SccSint) %s->value.intVal;\n" % (destVar, srcVDMVariable)]
 
     def MapBoolean(self, srcVDMVariable, destVar, _, __, ___):
-        return ["%s = (%s->value.boolVal==TRUE)?0xff:0;\n" % (destVar, srcVDMVariable)]
-'''
-    def MapReal(self, srcSDLVariable, destVar, _, __, ___):
-        return ["%s = (double)%s;\n" % (destVar, srcSDLVariable)]
+        return ["%s = (%s->value.boolVal==true)?0xff:0;\n" % (destVar, srcVDMVariable)]
 
+    def MapReal(self, srcSDLVariable, destVar, _, __, ___):
+        return ["%s = %s->value.doubleVal;\n" % (destVar, srcSDLVariable)]
+'''
     def MapOctetString(self, srcSDLVariable, destVar, node, __, ___):
         lines = []  # type: List[str]
         lines.append("{\n")
@@ -161,11 +161,11 @@ class FromASN1SCCtoVDM(RecursiveMapper):
         return ["%s = newInt(%s);\n" % (dstVDMVariable, srcVar)]
 
     def MapBoolean(self, srcVar, dstVDMVariable, _, __, ___):
-        return ["%s = (%s)?newBool(TRUE):newBool(FALSE);\n" % (dstVDMVariable, srcVar)]
-'''
-    def MapReal(self, srcVar, dstSDLVariable, _, __, ___):
-        return ["%s = %s;\n" % (dstSDLVariable, srcVar)]
+        return ["%s = (%s)?newBool(true):newBool(false);\n" % (dstVDMVariable, srcVar)]
 
+    def MapReal(self, srcVar, dstSDLVariable, _, __, ___):
+        return ["%s = newReal(%s);\n" % (dstSDLVariable, srcVar)]
+'''
     def MapOctetString(self, srcVar, dstSDLVariable, node, _, __):
         # for i in xrange(0, node._range[-1]):
         #     lines.append("%s[%d] = %s->buf[%d];\n" % (dstSDLVariable, i, srcVar, i))
