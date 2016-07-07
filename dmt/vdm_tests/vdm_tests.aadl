@@ -7,19 +7,24 @@ PROPERTIES
 	Source_Language => Vdm;
 END mytestsubsystemEmpty.Vdm;
 
--- GUIs can't tolerate empty param set
 
 SUBPROGRAM mytestsubsystem
 FEATURES
-	my_in_AType:IN PARAMETER DataView::MInt {encoding=>UPER;};
-	my_out_TypeEnumerated:OUT PARAMETER DataView::MInt {encoding=>UPER;};
+	my_in_MInt:IN PARAMETER DataView::MInt {encoding=>UPER;};
+	my_out_MInt:OUT PARAMETER DataView::MInt {encoding=>UPER;};
+
+	my_in_MBool:IN PARAMETER DataView::MBool {encoding=>UPER;};
+	my_out_MBool:OUT PARAMETER DataView::MBool {encoding=>UPER;};
+
+	my_in_MSeq:IN PARAMETER DataView::MSeq {encoding=>UPER;};
+	my_out_MSeq:OUT PARAMETER DataView::MSeq {encoding=>UPER;};
 
 END mytestsubsystem;
 
 
 SUBPROGRAM IMPLEMENTATION mytestsubsystem.Vdm
 PROPERTIES
-	FV_Name => "mytestsubsystem_fv_Simulink";
+	FV_Name => "mytestsubsystem_fv_Vdm";
 	Source_Language => Vdm;
 END mytestsubsystem.Vdm;
 

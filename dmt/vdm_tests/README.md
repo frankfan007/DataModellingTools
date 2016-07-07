@@ -9,7 +9,7 @@ VDM Test directory
 
 Run the code generation:
 
-`$ aadl2glueC -o output vdm_tests.aadl DataView.aadl`
+`$ aadl2glueC -o output/tester vdm_tests.aadl DataView.aadl`
 
 Compile the generated code:
 

@@ -67,6 +67,29 @@ class FromVDMToASN1SCC(RecursiveMapper):
 
     def MapReal(self, srcSDLVariable, destVar, _, __, ___):
         return ["%s = %s->value.doubleVal;\n" % (destVar, srcSDLVariable)]
+
+    def MapSequenceOf(self, srcVDMVariable, destVar, node, leafTypeDict, names):
+        lines = []  # type: List[str]
+        lines.append("{\n")
+        uniqueId = self.UniqueID()
+        lines.append("    int i%s;\n" % uniqueId)
+        lines.append("    int size%s = ((TVP) vdmSeqLen(%s))->value.intVal;\n" %(uniqueId, srcVDMVariable))
+        lines.append("    for(i%s=1; i%s<=size%s; i%s++) {\n" % (uniqueId, uniqueId, uniqueId, uniqueId))
+        lines.extend(
+            ["        " + x
+             for x in self.Map(
+                 "vdmSeqIndex(%s,newInt(i%s))" % (srcVDMVariable, uniqueId),
+                 "%s.arr[i%s-1]" % (destVar, uniqueId),
+                 node._containedType,
+                 leafTypeDict,
+                 names)])
+        lines.append("    }\n")
+        if isSequenceVariable(node):
+            lines.append("    %s.nCount = size%s;\n" % (destVar, uniqueId))
+        lines.append("}\n")
+        self.DecreaseUniqueID()
+        return lines
+
 '''
     def MapOctetString(self, srcSDLVariable, destVar, node, __, ___):
         lines = []  # type: List[str]
@@ -117,28 +140,7 @@ class FromVDMToASN1SCC(RecursiveMapper):
             lines.append("    %s.kind = %s;\n" % (destVar, self.CleanName(child[2])))
             lines.append("}\n")
         return lines
-
-    def MapSequenceOf(self, srcSDLVariable, destVar, node, leafTypeDict, names):
-        lines = []  # type: List[str]
-        lines.append("{\n")
-        uniqueId = self.UniqueID()
-        lines.append("    int i%s;\n" % uniqueId)
-        lines.append("    for(i%s=0; i%s<%s.length; i%s++) {\n" % (uniqueId, uniqueId, srcSDLVariable, uniqueId))
-        lines.extend(
-            ["        " + x
-             for x in self.Map(
-                 "%s.elements[i%s]" % (srcSDLVariable, uniqueId),
-                 "%s.arr[i%s]" % (destVar, uniqueId),
-                 node._containedType,
-                 leafTypeDict,
-                 names)])
-        lines.append("    }\n")
-        if isSequenceVariable(node):
-            lines.append("    %s.nCount = %s.length;\n" % (destVar, srcSDLVariable))
-        lines.append("}\n")
-        self.DecreaseUniqueID()
-        return lines
-
+    
     def MapSetOf(self, unused_srcSDLVariable, unused_destVar, node, unused_leafTypeDict, unused_names):
         panic("The PragmaDev mapper does not support SETOF. Please use SEQUENCEOF instead (%s)" % node.Location())  # pragma: nocover
 
@@ -165,6 +167,29 @@ class FromASN1SCCtoVDM(RecursiveMapper):
 
     def MapReal(self, srcVar, dstSDLVariable, _, __, ___):
         return ["%s = newReal(%s);\n" % (dstSDLVariable, srcVar)]
+
+    def MapSequenceOf(self, srcVar, dstVDMVariable, node, leafTypeDict, names):
+        lines = []  # type: List[str]
+        lines.append("{\n")
+        uniqueId = self.UniqueID()
+        limit = sourceSequenceLimit(node, srcVar)
+        lines.append("    int i%s;\n" % uniqueId)
+        #lines.append("    %s.length = %s;\n" % (dstSDLVariable, limit))
+        lines.append("    UNWRAP_COLLECTION(col, %s)" % dstVDMVariable)
+        lines.append("    for(i%s=0; i%s<%s; i%s++) {\n" % (uniqueId, uniqueId, limit, uniqueId))
+        lines.extend(
+            ["        " + x
+             for x in self.Map(
+                 srcVar + ".arr[i%s-1]" % uniqueId,
+                 "col->value[i%s]" % (uniqueId),
+                 node._containedType,
+                 leafTypeDict,
+                 names)])
+        lines.append("    }\n")
+        lines.append("}\n")
+        self.DecreaseUniqueID()
+        return lines
+
 '''
     def MapOctetString(self, srcVar, dstSDLVariable, node, _, __):
         # for i in xrange(0, node._range[-1]):
@@ -221,27 +246,6 @@ class FromASN1SCCtoVDM(RecursiveMapper):
             lines.append("}\n")
         return lines
 
-    def MapSequenceOf(self, srcVar, dstSDLVariable, node, leafTypeDict, names):
-        lines = []  # type: List[str]
-        lines.append("{\n")
-        uniqueId = self.UniqueID()
-        limit = sourceSequenceLimit(node, srcVar)
-        lines.append("    int i%s;\n" % uniqueId)
-        lines.append("    %s.length = %s;\n" % (dstSDLVariable, limit))
-        lines.append("    for(i%s=0; i%s<%s; i%s++) {\n" % (uniqueId, uniqueId, limit, uniqueId))
-        lines.extend(
-            ["        " + x
-             for x in self.Map(
-                 srcVar + ".arr[i%s]" % uniqueId,
-                 "%s.elements[i%s]" % (dstSDLVariable, uniqueId),
-                 node._containedType,
-                 leafTypeDict,
-                 names)])
-        lines.append("    }\n")
-        lines.append("}\n")
-        self.DecreaseUniqueID()
-        return lines
-
     def MapSetOf(self, unused_srcVar, unused_dstSDLVariable, node, unused_leafTypeDict, unused_names):
         panic("The PragmaDev mapper does not support SETOF. Please use SEQUENCEOF instead (%s)" % node.Location())  # pragma: nocover
 '''
@@ -258,7 +262,7 @@ class VDM_GlueGenerator(ASynchronousToolGlueGenerator):
     def HeadersOnStartup(self, unused_asnFile, unused_outputDir, unused_maybeFVname):
         self.C_HeaderFile.write("#include <assert.h>\n\n")
         self.C_HeaderFile.write("#include \"%s.h\"\n" % self.asn_name)
-        self.C_HeaderFile.write("#include \"vdm2c/Vdm.h\"\n\n")
+        self.C_HeaderFile.write("#include \"Vdm.h\"\n\n")
 
     def Encoder(self, nodeTypename, node, leafTypeDict, names, encoding):
         if encoding.lower() in ["uper", "acn"]:
