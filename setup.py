@@ -9,19 +9,14 @@ Usage:  python setup.py sdist   --> to create a tarball
 
 from setuptools import setup, find_packages
 
-from dmt import (
-    commonPy, asn2dataModel, A_mappers, B_mappers, asn2aadlPlus,
-    aadl2glueC, msgPrinter, msgPrinterASN1)
-
 setup(
     name='dmt',
-    version=commonPy.__version__,
+    version="2.0.3",
     packages=find_packages(),
     author='Thanassis Tsiodras',
     author_email='Thanassis.Tsiodras@esa.int',
     description='TASTE Data Modelling Technologies based on ASN.1',
     long_description=open('README.md').read(),
-    install_requires=[],
     include_package_data=True,
     url='http://taste.tuxfamily.org',
     classifiers=[
@@ -29,6 +24,18 @@ setup(
         'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPL)',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3.5'
+    ],
+    install_requires=[
+        'coverage==3.7.1',
+        'flake8==2.6.0',
+        'mypy-lang==0.4.2',
+        'pyflakes==1.2.3',
+        'pylint==1.5.6',
+        'pytest==2.6.3',
+        'lxml==3.6.0',
+        'astroid==1.4.6',
+        'pycodestyle==2.0.0',
+        'typing==3.5.2.2',
     ],
     entry_points={
         'console_scripts': [
