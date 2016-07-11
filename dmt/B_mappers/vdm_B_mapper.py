@@ -60,26 +60,27 @@ class FromVDMToASN1SCC(RecursiveMapper):
         self.uniqueID -= 1
 
     def MapInteger(self, srcVDMVariable, destVar, _, __, ___):
-        return ["%s = (asn1SccSint) %s->value.intVal;\n" % (destVar, srcVDMVariable)]
+        return ["%s = (asn1SccSint)((TVP) %s)->value.intVal;\n" % (destVar, srcVDMVariable)]
 
     def MapBoolean(self, srcVDMVariable, destVar, _, __, ___):
         return ["%s = (%s->value.boolVal==true)?0xff:0;\n" % (destVar, srcVDMVariable)]
 
-    def MapReal(self, srcSDLVariable, destVar, _, __, ___):
-        return ["%s = %s->value.doubleVal;\n" % (destVar, srcSDLVariable)]
+    def MapReal(self, srcVDMVariable, destVar, _, __, ___):
+        return ["%s = ((TVP) %s)->value.doubleVal;\n" % (destVar, srcVDMVariable)]
 
     def MapSequenceOf(self, srcVDMVariable, destVar, node, leafTypeDict, names):
         lines = []  # type: List[str]
         lines.append("{\n")
         uniqueId = self.UniqueID()
         lines.append("    int i%s;\n" % uniqueId)
-        lines.append("    int size%s = ((TVP) vdmSeqLen(%s))->value.intVal;\n" %(uniqueId, srcVDMVariable))
-        lines.append("    for(i%s=1; i%s<=size%s; i%s++) {\n" % (uniqueId, uniqueId, uniqueId, uniqueId))
+        lines.append("    UNWRAP_COLLECTION(col, %s);" % srcVDMVariable)
+        lines.append("    int size%s = col->size;" % uniqueId);
+        lines.append("    for(i%s=0; i%s<size%s; i%s++) {\n" % (uniqueId, uniqueId, uniqueId, uniqueId))
         lines.extend(
             ["        " + x
              for x in self.Map(
-                 "vdmSeqIndex(%s,newInt(i%s))" % (srcVDMVariable, uniqueId),
-                 "%s.arr[i%s-1]" % (destVar, uniqueId),
+                 "col->value[i%s]" % uniqueId,
+                 "%s.arr[i%s]" % (destVar, uniqueId),
                  node._containedType,
                  leafTypeDict,
                  names)])
@@ -90,21 +91,22 @@ class FromVDMToASN1SCC(RecursiveMapper):
         self.DecreaseUniqueID()
         return lines
 
-'''
-    def MapOctetString(self, srcSDLVariable, destVar, node, __, ___):
+    def MapOctetString(self, srcVDMVariable, destVar, node, __, ___):
         lines = []  # type: List[str]
         lines.append("{\n")
         lines.append("    int i;\n")
-        lines.append("    for(i=0; i<%s.__length; i++) {\n" % srcSDLVariable)
-        lines.append("        %s.arr[i] = %s.__string[i];\n" % (destVar, srcSDLVariable))
+        lines.append("    UNWRAP_COLLECTION(col, %s);" % srcVDMVariable)
+        lines.append("    int size = col->size;")
+        lines.append("    for(i=0; i<size; i++) {\n")
+        lines.append("        %s.arr[i] = col->value[i]->value.charVal;\n" % destVar)
         lines.append("    }\n")
         # for i in xrange(0, node._range[-1]):
         #     lines.append("    placeHolder[%d] = %s[%d];\n" % (i, srcSDLVariable, i))
         if isSequenceVariable(node):
-            lines.append("    %s.nCount = %s.__length;\n" % (destVar, srcSDLVariable))
+            lines.append("    %s.nCount = size;\n" % destVar)
         lines.append("}\n")
         return lines
-
+'''
     def MapEnumerated(self, srcSDLVariable, destVar, _, __, ___):
         return ["%s = %s;\n" % (destVar, srcSDLVariable)]
 
@@ -174,8 +176,7 @@ class FromASN1SCCtoVDM(RecursiveMapper):
         uniqueId = self.UniqueID()
         limit = sourceSequenceLimit(node, srcVar)
         lines.append("    int i%s;\n" % uniqueId)
-        #lines.append("    %s.length = %s;\n" % (dstSDLVariable, limit))
-        lines.append("    UNWRAP_COLLECTION(col, %s)" % dstVDMVariable)
+        lines.append("    UNWRAP_COLLECTION(col, %s);" % dstVDMVariable)
         lines.append("    for(i%s=0; i%s<%s; i%s++) {\n" % (uniqueId, uniqueId, limit, uniqueId))
         lines.extend(
             ["        " + x
@@ -190,25 +191,20 @@ class FromASN1SCCtoVDM(RecursiveMapper):
         self.DecreaseUniqueID()
         return lines
 
-'''
-    def MapOctetString(self, srcVar, dstSDLVariable, node, _, __):
+    def MapOctetString(self, srcVar, dstVDMVariable, node, _, __):
         # for i in xrange(0, node._range[-1]):
         #     lines.append("%s[%d] = %s->buf[%d];\n" % (dstSDLVariable, i, srcVar, i))
         lines = []  # type: List[str]
         limit = sourceSequenceLimit(node, srcVar)
         lines.append("{\n")
         lines.append("    int i;\n")
+        lines.append("    UNWRAP_COLLECTION(col, %s);" % dstVDMVariable)
         lines.append("    for(i=0; i<%s; i++) {\n" % limit)
-        lines.append("        %s.__string[i] = %s.arr[i];\n" % (dstSDLVariable, srcVar))
+        lines.append("        col->value[i] = newChar(%s.arr[i]);\n" % (srcVar))
         lines.append("    }\n")
-        lines.append("    while(i<%d) {\n" % node._range[-1])
-        lines.append("        %s.__string[i]=0;\n" % dstSDLVariable)
-        lines.append("        i++;\n")
-        lines.append("    };\n")
-        lines.append("    %s.__length = %s;\n" % (dstSDLVariable, limit))
         lines.append("}\n")
         return lines
-
+'''
     def MapEnumerated(self, srcVar, dstSDLVariable, _, __, ___):
         return ["%s = %s;\n" % (dstSDLVariable, srcVar)]
 
