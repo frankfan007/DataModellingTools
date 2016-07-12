@@ -181,7 +181,7 @@ class FromASN1SCCtoVDM(RecursiveMapper):
         lines.extend(
             ["        " + x
              for x in self.Map(
-                 srcVar + ".arr[i%s-1]" % uniqueId,
+                 srcVar + ".arr[i%s]" % uniqueId,
                  "col->value[i%s]" % (uniqueId),
                  node._containedType,
                  leafTypeDict,
