@@ -28,7 +28,7 @@ It is used to model asynchronous processes (SDL)...
 
 '''
 
-from ..commonPy.utility import panic
+# from ..commonPy.utility import panic
 from ..commonPy.asnAST import isSequenceVariable, sourceSequenceLimit, AsnBasicNode, AsnEnumerated
 
 from ..commonPy.recursiveMapper import RecursiveMapper
@@ -74,7 +74,7 @@ class FromVDMToASN1SCC(RecursiveMapper):
         uniqueId = self.UniqueID()
         lines.append("    int i%s;\n" % uniqueId)
         lines.append("    UNWRAP_COLLECTION(col, %s);" % srcVDMVariable)
-        lines.append("    int size%s = col->size;" % uniqueId);
+        lines.append("    int size%s = col->size;" % uniqueId)
         lines.append("    for(i%s=0; i%s<size%s; i%s++) {\n" % (uniqueId, uniqueId, uniqueId, uniqueId))
         lines.extend(
             ["        " + x
@@ -106,26 +106,33 @@ class FromVDMToASN1SCC(RecursiveMapper):
             lines.append("    %s.nCount = size;\n" % destVar)
         lines.append("}\n")
         return lines
-'''
-    def MapEnumerated(self, srcSDLVariable, destVar, _, __, ___):
-        return ["%s = %s;\n" % (destVar, srcSDLVariable)]
 
-    def MapSequence(self, srcSDLVariable, destVar, node, leafTypeDict, names):
+    def MapEnumerated(self, srcVDMVariable, destVar, node, _, __):
+        lines = []
+        lines.append("switch(%s) {\n" %srcVDMVariable)
+        for m in node._members:
+            lines.append("    case QUOTE_%s:\n" % m[0].upper())
+            lines.append("        (%s) = %s;\n" % (destVar, m[1]))
+            lines.append("        break;\n")
+        lines.append("}\n")
+        return lines
+
+    def MapSequence(self, srcVDMVariable, destVar, node, leafTypeDict, names):
         lines = []  # type: List[str]
         for child in node._members:
             lines.extend(
                 self.Map(
-                    "%s.%s" % (srcSDLVariable, self.CleanName(child[0])),
+                    "%s.%s" % (srcVDMVariable, self.CleanName(child[0])),
                     destVar + "." + self.CleanName(child[0]),
                     child[1],
                     leafTypeDict,
                     names))
         return lines
 
-    def MapSet(self, srcSDLVariable, destVar, node, leafTypeDict, names):
-        return self.MapSequence(srcSDLVariable, destVar, node, leafTypeDict, names)  # pragma: nocover
-
-    def MapChoice(self, srcSDLVariable, destVar, node, leafTypeDict, names):
+    def MapSet(self, srcVDMVariable, destVar, node, leafTypeDict, names):
+        return self.MapSequence(srcVDMVariable, destVar, node, leafTypeDict, names)  # pragma: nocover
+'''
+    def MapChoice(self, srcVDMVariable, destVar, node, leafTypeDict, names):
         lines = []  # type: List[str]
         childNo = 0
         for child in node._members:
@@ -142,11 +149,11 @@ class FromVDMToASN1SCC(RecursiveMapper):
             lines.append("    %s.kind = %s;\n" % (destVar, self.CleanName(child[2])))
             lines.append("}\n")
         return lines
-    
+
     def MapSetOf(self, unused_srcSDLVariable, unused_destVar, node, unused_leafTypeDict, unused_names):
         panic("The PragmaDev mapper does not support SETOF. Please use SEQUENCEOF instead (%s)" % node.Location())  # pragma: nocover
-
 '''
+
 
 # noinspection PyListCreation
 # pylint: disable=no-self-use
@@ -204,17 +211,24 @@ class FromASN1SCCtoVDM(RecursiveMapper):
         lines.append("    }\n")
         lines.append("}\n")
         return lines
-'''
-    def MapEnumerated(self, srcVar, dstSDLVariable, _, __, ___):
-        return ["%s = %s;\n" % (dstSDLVariable, srcVar)]
 
-    def MapSequence(self, srcVar, dstSDLVariable, node, leafTypeDict, names):
+    def MapEnumerated(self, srcVar, dstVDMVariable, node, _, __):
+        lines = []
+        lines.append("switch(%s) {\n" %srcVar)
+        for m in node._members:
+            lines.append("    case %s:\n" % m[1])
+            lines.append("        (%s) = newQuote(QUOTE_%s);\n" % (dstVDMVariable, m[0].upper()))
+            lines.append("        break;\n")
+        lines.append("}\n")
+        return lines
+
+    def MapSequence(self, srcVar, dstVDMVariable, node, leafTypeDict, names):
         lines = []  # type: List[str]
         for child in node._members:
             lines.extend(
                 self.Map(
                     srcVar + "." + self.CleanName(child[0]),
-                    "%s.%s" % (dstSDLVariable, self.CleanName(child[0])),
+                    "%s.%s" % (dstVDMVariable, self.CleanName(child[0])),
                     child[1],
                     leafTypeDict,
                     names))
@@ -222,7 +236,7 @@ class FromASN1SCCtoVDM(RecursiveMapper):
 
     def MapSet(self, srcVar, dstSDLVariable, node, leafTypeDict, names):
         return self.MapSequence(srcVar, dstSDLVariable, node, leafTypeDict, names)  # pragma: nocover
-
+'''
     def MapChoice(self, srcVar, dstSDLVariable, node, leafTypeDict, names):
         lines = []  # type: List[str]
         childNo = 0
@@ -246,6 +260,7 @@ class FromASN1SCCtoVDM(RecursiveMapper):
         panic("The PragmaDev mapper does not support SETOF. Please use SEQUENCEOF instead (%s)" % node.Location())  # pragma: nocover
 '''
 
+
 class VDM_GlueGenerator(ASynchronousToolGlueGenerator):
     def __init__(self):
         ASynchronousToolGlueGenerator.__init__(self)
@@ -256,6 +271,8 @@ class VDM_GlueGenerator(ASynchronousToolGlueGenerator):
         print("Code generator: " + "$Id: vdm_B_mapper.py 2390 2015-07-04 12:39:17Z tfabbri $")
 
     def HeadersOnStartup(self, unused_asnFile, unused_outputDir, unused_maybeFVname):
+        print(unused_asnFile)
+
         self.C_HeaderFile.write("#include <assert.h>\n\n")
         self.C_HeaderFile.write("#include \"%s.h\"\n" % self.asn_name)
         self.C_HeaderFile.write("#include \"Vdm.h\"\n\n")
@@ -279,7 +296,7 @@ class VDM_GlueGenerator(ASynchronousToolGlueGenerator):
         # Write the mapping code for the message
         if self.useOSS:
             print('useOSS')
-            #lines = self.FromRTDSToOSS.Map(
+            # lines = self.FromRTDSToOSS.Map(
             #    "(%sVDM)" % ("*" if isPointer else ""),
             #    "(*ptrASN1SCC)",
             #    node,

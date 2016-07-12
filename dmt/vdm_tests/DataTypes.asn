@@ -4,5 +4,6 @@ MBool ::= BOOLEAN
 MInt  ::= INTEGER (0 .. 20)
 MSeq  ::= SEQUENCE SIZE((5)) OF BOOLEAN
 MOct  ::= OCTET STRING(SIZE(1..40))
+MEnum ::= ENUMERATED{slave(0), master(1)}
 
 END
