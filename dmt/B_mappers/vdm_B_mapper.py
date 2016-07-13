@@ -39,7 +39,7 @@ from . import c_B_mapper
 isAsynchronous = True
 rtdsBackend = None
 cBackend = None
-vdmBacked = None
+vdmBackend = None
 
 
 def Version():
