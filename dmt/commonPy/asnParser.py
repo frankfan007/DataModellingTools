@@ -76,11 +76,13 @@ AST_Lookup = Dict[Typename, AsnNode]
 AST_TypenamesOfFile = Dict[Filename, List[str]]  # pylint: disable=invalid-sequence-index
 AST_TypesOfFile = Dict[Filename, List[AsnNode]]  # pylint: disable=invalid-sequence-index
 AST_Leaftypes = Dict[Typename, str]
+AST_Modules = Dict[str, List[Typename]]  # pylint: disable=invalid-sequence-index
 
 g_names = {}         # type: AST_Lookup
 g_typesOfFile = {}   # type: AST_TypenamesOfFile
 g_leafTypeDict = {}  # type: AST_Leaftypes
 g_astOfFile = {}     # type: AST_TypesOfFile
+g_modules = {}       # type: AST_Modules
 
 g_checkedSoFarForKeywords = {}  # type: Dict[str, int]
 
@@ -93,8 +95,7 @@ g_invalidKeywords = [
 ]
 
 tokens = (
-    'DEFINITIONS', 'APPLICATION', 'AUTOMATIC', 'IMPLICIT', 'EXPLICIT', 'TAGS', 'BEGIN', 'IMPORTS', 'EXPORTS', 'FROM', 'ALL', 'CHOICE', 'SEQUENCE', 'SET', 'OF', 'END', 'OPTIONAL', 'INTEGER', 'REAL', 'OCTET',  # 'BIT',
-    'STRING', 'BOOLEAN', 'TRUE', 'FALSE', 'ASCIISTRING', 'NUMBERSTRING', 'VISIBLESTRING', 'PRINTABLESTRING', 'UTF8STRING', 'ENUMERATED', 'SEMI', 'LPAREN', 'RPAREN', 'LBRACKET', 'RBRACKET', 'BLOCK_END', 'BLOCK_BEGIN', 'DEF', 'NAME', 'COMMA', 'INTVALUE', 'REALVALUE', 'DEFAULT', 'SIZE', 'DOTDOT', 'DOTDOTDOT', 'WITH', 'COMPONENTS', 'MANTISSA', 'BASE', 'EXPONENT'
+    'DEFINITIONS', 'APPLICATION', 'AUTOMATIC', 'IMPLICIT', 'EXPLICIT', 'TAGS', 'BEGIN', 'IMPORTS', 'EXPORTS', 'FROM', 'ALL', 'CHOICE', 'SEQUENCE', 'SET', 'OF', 'END', 'OPTIONAL', 'INTEGER', 'REAL', 'OCTET', 'STRING', 'BOOLEAN', 'TRUE', 'FALSE', 'ASCIISTRING', 'NUMBERSTRING', 'VISIBLESTRING', 'PRINTABLESTRING', 'UTF8STRING', 'ENUMERATED', 'SEMI', 'LPAREN', 'RPAREN', 'LBRACKET', 'RBRACKET', 'BLOCK_END', 'BLOCK_BEGIN', 'DEF', 'NAME', 'COMMA', 'INTVALUE', 'REALVALUE', 'DEFAULT', 'SIZE', 'DOTDOT', 'DOTDOTDOT', 'WITH', 'COMPONENTS', 'MANTISSA', 'BASE', 'EXPONENT'  # 'BIT',
 )
 
 lotokens = [tkn.lower() for tkn in tokens]
@@ -105,12 +106,11 @@ lotokens = [tkn.lower() for tkn in tokens]
 #    'BIT': 'BIT',
 reserved = {
     'DEFINITIONS': 'DEFINITIONS', 'APPLICATION': 'APPLICATION', 'TAGS': 'TAGS', 'BEGIN': 'BEGIN', 'CHOICE': 'CHOICE',
-    'SEQUENCE': 'SEQUENCE', 'SET': 'SET', 'OF': 'OF', 'END': 'END', 'OPTIONAL': 'OPTIONAL', 'BOOLEAN': 'BOOLEAN',
-    'INTEGER': 'INTEGER', 'REAL': 'REAL', 'OCTET': 'OCTET', 'STRING': 'STRING', 'UTF8String': 'UTF8STRING',
-    'AsciiString': 'ASCIISTRING', 'NumberString': 'NUMBERSTRING', 'VisibleString': 'VISIBLESTRING',
-    'PrintableString': 'PRINTABLESTRING', 'ENUMERATED': 'ENUMERATED', 'AUTOMATIC': 'AUTOMATIC', 'SIZE': 'SIZE',
-    'IMPLICIT': 'IMPLICIT', 'EXPLICIT': 'EXPLICIT', 'TRUE': 'TRUE', 'FALSE': 'FALSE', 'DEFAULT': 'DEFAULT',
-    'mantissa': 'MANTISSA', 'base': 'BASE', 'exponent': 'EXPONENT', 'WITH': 'WITH', 'FROM': 'FROM',
+    'SEQUENCE': 'SEQUENCE', 'SET': 'SET', 'OF': 'OF', 'END': 'END', 'OPTIONAL': 'OPTIONAL', 'BOOLEAN': 'BOOLEAN', 'INTEGER': 'INTEGER',
+    'REAL': 'REAL', 'OCTET': 'OCTET', 'STRING': 'STRING', 'UTF8String': 'UTF8STRING', 'AsciiString': 'ASCIISTRING',
+    'NumberString': 'NUMBERSTRING', 'VisibleString': 'VISIBLESTRING', 'PrintableString': 'PRINTABLESTRING', 'ENUMERATED': 'ENUMERATED',
+    'AUTOMATIC': 'AUTOMATIC', 'SIZE': 'SIZE', 'IMPLICIT': 'IMPLICIT', 'EXPLICIT': 'EXPLICIT', 'TRUE': 'TRUE', 'FALSE': 'FALSE',
+    'DEFAULT': 'DEFAULT', 'mantissa': 'MANTISSA', 'base': 'BASE', 'exponent': 'EXPONENT', 'WITH': 'WITH', 'FROM': 'FROM',
     'IMPORTS': 'IMPORTS', 'EXPORTS': 'EXPORTS', 'ALL': 'ALL', 'COMPONENTS': 'COMPONENTS'
 }
 
@@ -846,6 +846,7 @@ def ParseASN1SCC_AST(filename: str) -> None:
         for typeName, typeData in m._typeAssignments:
             # print "Type:", typeName
             g_names[typeName] = typeData
+            g_modules.setdefault(m._id, []).append(typeName)
     g_leafTypeDict.update(VerifyAndFixAST())
 
     for nodeTypename in list(g_names.keys()):
