@@ -38,6 +38,7 @@ from ..commonPy.asnAST import (
     AsnBasicNode, AsnNode, AsnSequence, AsnSet, AsnSetOf, AsnSequenceOf)
 from ..commonPy.asnParser import AST_Lookup, AST_Leaftypes
 from ..commonPy.recursiveMapper import RecursiveMapper
+from ..commonPy.asnParser import g_modules, g_names, g_leafTypeDict
 
 from .asynchronousTool import ASynchronousToolGlueGenerator
 
@@ -46,6 +47,7 @@ from . import c_B_mapper
 isAsynchronous = True
 cBackend = None
 vdmBackend = None
+
 
 
 def Version() -> None:
@@ -275,11 +277,17 @@ class VDM_GlueGenerator(ASynchronousToolGlueGenerator):
         print("Code generator: " + "$Id: vdm_B_mapper.py 2390 2015-07-04 12:39:17Z tfabbri $")
 
     def HeadersOnStartup(self, unused_asnFile: str, unused_outputDir: str, unused_maybeFVname: str) -> None:
-        print(unused_asnFile)
-
-        self.C_HeaderFile.write("#include <assert.h>\n\n")
+        # Constant includes
+        self.C_HeaderFile.write("#include <assert.h>\n")
         self.C_HeaderFile.write("#include \"%s.h\"\n" % self.asn_name)
-        self.C_HeaderFile.write("#include \"Vdm.h\"\n\n")
+        self.C_HeaderFile.write("#include \"Vdm.h\"\n")
+        # Includes depending on the Asn data specification
+        for i in g_modules:
+            self.C_HeaderFile.write("#include \"%s.h\"\n" % i.replace('-', '_'))
+        for i in g_names:
+            if g_names[i]._leafType == 'SEQUENCE' or g_names[i]._leafType == 'SET':
+                self.C_HeaderFile.write("#include \"%s.h\"\n"% i.replace('-', '_'))
+        self.C_HeaderFile.write('\n')
 
     def Encoder(self, nodeTypename: str, node: AsnNode, leafTypeDict: AST_Leaftypes, names: AST_Lookup, encoding: str) -> None:
         if encoding.lower() in ["uper", "acn"]:
