@@ -38,7 +38,7 @@ from ..commonPy.asnAST import (
     AsnBasicNode, AsnNode, AsnSequence, AsnSet, AsnSetOf, AsnSequenceOf)
 from ..commonPy.asnParser import AST_Lookup, AST_Leaftypes
 from ..commonPy.recursiveMapper import RecursiveMapper
-from ..commonPy.asnParser import g_modules, g_names, g_leafTypeDict
+from ..commonPy.asnParser import g_modules, g_names
 
 from .asynchronousTool import ASynchronousToolGlueGenerator
 
@@ -47,7 +47,6 @@ from . import c_B_mapper
 isAsynchronous = True
 cBackend = None
 vdmBackend = None
-
 
 
 def Version() -> None:
