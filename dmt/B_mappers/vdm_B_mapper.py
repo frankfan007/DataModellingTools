@@ -67,7 +67,7 @@ class FromVDMToASN1SCC(RecursiveMapper):
         self.uniqueID -= 1
 
     def MapInteger(self, srcVDMVariable: str, destVar: str, _: AsnInt, __: AST_Leaftypes, ___: AST_Lookup) -> List[str]:  # pylint: disable=invalid-sequence-index
-        return ["%s = (asn1SccSint)((TVP) %s)->value.intVal;\n" % (destVar, srcVDMVariable)]
+        return ["%s = (asn1SccSint)(%s)->value.intVal;\n" % (destVar, srcVDMVariable)]
 
     def MapBoolean(self, srcVDMVariable: str, destVar: str, _: AsnBool, __: AST_Leaftypes, ___: AST_Lookup)-> List[str]:  # pylint: disable=invalid-sequence-index
         return ["%s = (%s->value.boolVal==true)?0xff:0;\n" % (destVar, srcVDMVariable)]
@@ -116,7 +116,7 @@ class FromVDMToASN1SCC(RecursiveMapper):
 
     def MapEnumerated(self, srcVDMVariable: str, destVar: str, node: AsnEnumerated, __: AST_Leaftypes, ___: AST_Lookup) -> List[str]:  # pylint: disable=invalid-sequence-index
         lines = []  # type: List[str]
-        lines.append("switch(%s) {\n" %srcVDMVariable)
+        lines.append("switch(%s->value.intVal) {\n" %srcVDMVariable)
         for m in node._members:
             lines.append("    case QUOTE_%s:\n" % m[0].upper())
             lines.append("        (%s) = %s;\n" % (destVar, m[1]))
@@ -126,10 +126,15 @@ class FromVDMToASN1SCC(RecursiveMapper):
 
     def MapSequence(self, srcVDMVariable: str, destVar: str, node: AsnSequenceOrSet, leafTypeDict: AST_Leaftypes, names: AST_Lookup) -> List[str]:  # pylint: disable=invalid-sequence-index
         lines = []  # type: List[str]
+        for key in names:
+            if names[key] == node:
+                type_str= key # type: str
+
         for child in node._members:
             lines.extend(
                 self.Map(
-                    "%s.%s" % (srcVDMVariable, self.CleanName(child[0])),
+                    # "((struct * %s) (%s->value.ptr))->%s" % (type_str, srcVDMVariable, self.CleanName(child[0])),
+                    "TO_CLASS_PTR(%s, %s)->m_%s_%s" % (srcVDMVariable, type_str, type_str, self.CleanName(child[0])),
                     destVar + "." + self.CleanName(child[0]),
                     child[1],
                     leafTypeDict,
@@ -229,11 +234,15 @@ class FromASN1SCCtoVDM(RecursiveMapper):
 
     def MapSequence(self, srcVar: str, dstVDMVariable: str, node: AsnSequenceOrSet, leafTypeDict: AST_Leaftypes, names: AST_Lookup) -> List[str]:  # pylint: disable=invalid-sequence-index
         lines = []  # type: List[str]
+        for key in names:
+            if names[key] == node:
+                type_str = key  # type: str
+
         for child in node._members:
             lines.extend(
                 self.Map(
                     srcVar + "." + self.CleanName(child[0]),
-                    "%s.%s" % (dstVDMVariable, self.CleanName(child[0])),
+                    "TO_CLASS_PTR(%s, %s)->m_%s_%s" % (dstVDMVariable, type_str, type_str,  self.CleanName(child[0])),
                     child[1],
                     leafTypeDict,
                     names))
