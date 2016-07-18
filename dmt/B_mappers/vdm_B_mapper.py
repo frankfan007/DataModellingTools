@@ -128,7 +128,7 @@ class FromVDMToASN1SCC(RecursiveMapper):
         lines = []  # type: List[str]
         for key in names:
             if names[key] == node:
-                type_str= key # type: str
+                type_str = key  # type: str
 
         for child in node._members:
             lines.extend(
@@ -237,12 +237,11 @@ class FromASN1SCCtoVDM(RecursiveMapper):
         for key in names:
             if names[key] == node:
                 type_str = key  # type: str
-
         for child in node._members:
             lines.extend(
                 self.Map(
                     srcVar + "." + self.CleanName(child[0]),
-                    "TO_CLASS_PTR(%s, %s)->m_%s_%s" % (dstVDMVariable, type_str, type_str,  self.CleanName(child[0])),
+                    "TO_CLASS_PTR(%s, %s)->m_%s_%s" % (dstVDMVariable, type_str, type_str, self.CleanName(child[0])),
                     child[1],
                     leafTypeDict,
                     names))
