@@ -16,8 +16,11 @@ FEATURES
 	my_in_MBool:IN PARAMETER DataView::MBool {encoding=>UPER;};
 	my_out_MBool:OUT PARAMETER DataView::MBool {encoding=>UPER;};
 
-	my_in_MSeq:IN PARAMETER DataView::MSeq {encoding=>UPER;};
-	my_out_MSeq:OUT PARAMETER DataView::MSeq {encoding=>UPER;};
+	my_in_MSeqB:IN PARAMETER DataView::MSeqB {encoding=>UPER;};
+	my_out_MSeqB:OUT PARAMETER DataView::MSeqB {encoding=>UPER;};
+
+	my_in_MSeqI:IN PARAMETER DataView::MSeqI {encoding=>UPER;};
+	my_out_MSeqI:OUT PARAMETER DataView::MSeqI {encoding=>UPER;};
 
     	my_in_MOct:IN PARAMETER DataView::MOct {encoding=>UPER;};
 	my_out_MOct:OUT PARAMETER DataView::MOct {encoding=>UPER;};
