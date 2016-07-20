@@ -7,8 +7,8 @@ int main(){
      * The tests provided are the following:
      * INTEGER [X]
      * BOOLEAN [X]
-     * SEQUENCE OF INTEGER []
-     * SEQUENCE OF BOOLEAN []
+     * SEQUENCE OF INTEGER [X]
+     * SEQUENCE OF BOOLEAN [X]
      * ENUM []
      * OCTET STRING [] 
      *
@@ -88,7 +88,33 @@ int main(){
     printf("ASN1SCC Dest MSeqB\n");
     for(int i = 0; i < size; i++)
         printf("%d " , mseq_b.arr[i]);
-    printf("\n\n");   
-    return 0;
+    printf("\n\n");
 
+    // ENUM
+    printf("Test ENUM\n");
+    asn1SccMEnum menum = asn1Sccslave;
+    printf("ASN1SCC Source MEnum: %d\n", menum);
+    TVP menum_vdm;
+    Convert_MEnum_from_ASN1SCC_to_VDM(&menum_vdm, &menum);
+    printf("VDM Dest MEnum: %d\n", menum_vdm->value.intVal);
+    printf("VDM Ver. MEnum: %d\n", QUOTE_SLAVE);
+    menum_vdm->value.intVal = QUOTE_MASTER;
+    printf("VDM Source MEnum: %d\n", menum_vdm->value.intVal);
+    Convert_MEnum_from_VDM_to_ASN1SCC(&menum, menum_vdm);
+    printf("ASN1SCC Dest MEnum: %d\n\n", menum);
+    
+    // OCTET STRING
+    printf("Test Octet String\n");
+    asn1SccMOct moct = (asn1SccMOct){.arr = "test_str"};
+    printf("ASN1SCC Source MOct %s\n", moct.arr);
+    size = sizeof(moct.arr)/sizeof(moct.arr[0]);
+    printf("Size: %d\n", size);
+    TVP moct_vdm = newSeq(size);
+    Convert_MOct_from_ASN1SCC_to_VDM(&moct_vdm, &moct);
+    UNWRAP_COLLECTION(col_moct, moct_vdm);
+    printf("VDM Dest MOct \n");
+    for (int i=0; i < size; i++)
+        printf("%d", col_moct->value[i]->type);
+       // printf("%c", ((TVP) col_moct->value[i])->value.charVal);
+    return 0;
 }
