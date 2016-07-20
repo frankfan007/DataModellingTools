@@ -105,7 +105,7 @@ class FromVDMToASN1SCC(RecursiveMapper):
         lines.append("    UNWRAP_COLLECTION(col, %s);" % srcVDMVariable)
         lines.append("    int size = col->size;")
         lines.append("    for(i=0; i<size; i++) {\n")
-        lines.append("        %s.arr[i] = col->value[i]->value.charVal;\n" % destVar)
+        lines.append("        %s.arr[i] = (unsigned char) (col->value[i]->value.charVal);\n" % destVar)
         lines.append("    }\n")
         # for i in xrange(0, node._range[-1]):
         #     lines.append("    placeHolder[%d] = %s[%d];\n" % (i, srcSDLVariable, i))
@@ -217,7 +217,7 @@ class FromASN1SCCtoVDM(RecursiveMapper):
         lines.append("    int i;\n")
         lines.append("    UNWRAP_COLLECTION(col, %s);" % dstVDMVariable)
         lines.append("    for(i=0; i<%s; i++) {\n" % limit)
-        lines.append("        col->value[i] = newChar(%s.arr[i]);\n" % (srcVar))
+        lines.append("        col->value[i] = newChar((char) (%s.arr[i]));\n" % (srcVar))
         lines.append("    }\n")
         lines.append("}\n")
         return lines
