@@ -1,5 +1,7 @@
 [![Build and Test Status of Data Modelling Tools on Circle CI](https://circleci.com/gh/ttsiodras/DataModellingTools.svg?&style=shield&circle-token=9df10d36b6b4ccd923415a5890155b7bf54b95c5)](https://circleci.com/gh/ttsiodras/DataModellingTools/tree/master)
 
+[![Tommaso Build and Test Status](https://circleci.com/gh/tfabbri/DataModellingTools.svg?style=svg)](https://circleci.com/gh/tfabbri/DataModellingTools/tree/vdm-b-mapper)
+
 TASTE Data Modelling Tools
 ==========================
 
