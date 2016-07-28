@@ -14,7 +14,6 @@ Run the code generation:
 Compile the generated code:
 
 `$ cd output`  
-`$ asn1.exe -c -uPER -typePrefix "asn1Scc" -o tester`  
 `$ mkdir build`  
 `$ cd build`  
 `$ cmake ../`  
