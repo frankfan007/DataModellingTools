@@ -9,7 +9,7 @@ VDM Test directory
 
 Run the code generation:
 
-`$ aadl2glueC -o output/tester vdm_tests.aadl DataView.aadl`
+`$ ./gen_mapping.sh`
 
 Compile the generated code:
 
@@ -21,7 +21,7 @@ Compile the generated code:
 
 Run the generated code to test the B_mapper:
 
-`$ ./tester/tester`
+`$ ./exe/exe`
 
 
 
