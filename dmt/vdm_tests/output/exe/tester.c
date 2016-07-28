@@ -139,7 +139,7 @@ int main(){
     DataViewCLASS test_class;
     TVP vdm_mint_ret = _Z7vdm5funEI(test_class, vdm_mint);
     printf("Mint before: %d\n", vdm_mint->value.intVal);
-    printf("MInt after: %d\n", vdm_mint_ret->value.intVal);
+    printf("MInt after: %f\n", vdm_mint_ret->value.doubleVal);
 
     return 0;
 }
