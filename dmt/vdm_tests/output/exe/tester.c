@@ -50,22 +50,24 @@ int main(){
     // SEQUENCE OF INTEGER
     printf("Test SEQUENCE OF INTEGER\n");
     printf("ASN1SCC Source MSeqI\n");
-    asn1SccMSeqI mseq_i = (asn1SccMSeqI) { .arr= {1,2,3,4,5}, .nCount=5}; 
-    int size =  mseq_i.nCount;
-    for(int i=0; i < size; i++ )
-        printf("%d ", mseq_i.arr[i]);
+    asn1SccMSeqI mseq_i = (asn1SccMSeqI) { .arr= {1,2,3,4}, .nCount=4}; 
+    int size =  sizeof(mseq_i.arr)/sizeof(mseq_i.arr[0]);
+    for(int i=0; i < size; i++)
+            printf("%d ", mseq_i.arr[i]);
     printf("\n");
+
     TVP mseq_i_vdm = newSeq(size);
     Convert_MSeqI_from_ASN1SCC_to_VDM(&mseq_i_vdm, &mseq_i);
     UNWRAP_COLLECTION(col, mseq_i_vdm);
     printf("VDM Dest MSeqI\n");
-    for(int i=0; i < size; i++)
+    for(int i=0; i < mseq_i.nCount; i++)
         printf("%d ", ((TVP) col->value[i])->value.intVal);   
     printf("\n");
     col->value[3]->value.intVal = 10;
     printf("VDM Source MSeqI\n");
     for(int i=0; i < size; i++)
-        printf("%d ", ((TVP) col->value[i])->value.intVal);   
+        if (col->value[i] != NULL)
+            printf("%d ", ((TVP) col->value[i])->value.intVal);   
     printf("\n");
     Convert_MSeqI_from_VDM_to_ASN1SCC(&mseq_i, &mseq_i_vdm);
     printf("ASN1SCC Dest MSeqI\n");

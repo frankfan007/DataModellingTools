@@ -74,9 +74,9 @@ class FromVDMToASN1SCC(RecursiveMapper):
         lines.append("    int i%s;\n" % uniqueId)
         lines.append("    UNWRAP_COLLECTION(col, %s);" % srcVDMVariable)
         lines.append("    int size%s = col->size;" % uniqueId)
-        lines.append("    int count%s = 0" % uniqueId)
+        lines.append("    int count%s = 0;" % uniqueId)
         lines.append("    for(i%s=0; i%s<size%s; i%s++) {\n" % (uniqueId, uniqueId, uniqueId, uniqueId))
-        lines.append("if(col->value[i%s] != NULL){\n" % uniqueId)
+        lines.append("        if(col->value[i%s] != NULL){\n" % uniqueId)
         lines.extend(
             ["            " + x
              for x in self.Map(
@@ -89,25 +89,29 @@ class FromVDMToASN1SCC(RecursiveMapper):
         lines.append("        }\n")
         lines.append("    }\n")
         if isSequenceVariable(node):
-            lines.append("    %s.nCount = size%s;\n" % (destVar, uniqueId))
+            lines.append("    %s.nCount = count%s;\n" % (destVar, uniqueId))
         lines.append("}\n")
         self.DecreaseUniqueID()
         return lines
 
     def MapOctetString(self, srcVDMVariable: str, destVar: str, node: AsnOctetString, __: AST_Leaftypes, ___: AST_Lookup) -> List[str]:  # pylint: disable=invalid-sequence-index
         lines = []  # type: List[str]
+        uniqueId = self.UniqueID()
         lines.append("{\n")
-        lines.append("    int i;\n")
+        lines.append("    int i%s;\n" % uniqueId)
         lines.append("    UNWRAP_COLLECTION(col, %s);" % srcVDMVariable)
         lines.append("    int size = col->size;")
-        lines.append("    for(i=0; i<size; i++) {\n")
-        lines.append("        %s.arr[i] = (unsigned char) (col->value[i]->value.charVal);\n" % destVar)
+        lines.append("    int count%s = 0;" % uniqueId)
+        lines.append("    for(i%s=0; i%s<size; i%s++) {\n" % (uniqueId, uniqueId, uniqueId))
+        lines.append("        if(col->value[i%s] != NULL){\n" % uniqueId)
+        lines.append("            %s.arr[i%s] = (unsigned char) (col->value[i%s]->value.charVal);\n" % (destVar, uniqueId, uniqueId))
+        lines.append("            count%s++;\n" %uniqueId)
+        lines.append("        }\n")
         lines.append("    }\n")
-        # for i in xrange(0, node._range[-1]):
-        #     lines.append("    placeHolder[%d] = %s[%d];\n" % (i, srcSDLVariable, i))
         if isSequenceVariable(node):
-            lines.append("    %s.nCount = size;\n" % destVar)
+            lines.append("    %s.nCount = count%s;\n" % (destVar, uniqueId))
         lines.append("}\n")
+        self.DecreaseUniqueID()
         return lines
 
     def MapEnumerated(self, srcVDMVariable: str, destVar: str, node: AsnEnumerated, __: AST_Leaftypes, ___: AST_Lookup) -> List[str]:  # pylint: disable=invalid-sequence-index
