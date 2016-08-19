@@ -19,13 +19,8 @@
 # generated code.
 #
 '''
-This is the code generator for the PragmaDev RTDS code mappers.
-This backend is called by aadl2glueC, when an RTDS subprogram
-is identified in the input concurrency view.
-
-Implementation notes: Like OG, RTDS is a complex case;
-It is used to model asynchronous processes (SDL)...
-
+This is the code generator for the Overture VDM code mappers.
+This backend is called by aadl2glueC, when a VDM subprogram is identified in the input concurrency view.
 '''
 
 # from ..commonPy.utility import panic
@@ -42,10 +37,7 @@ from ..commonPy.asnParser import g_modules, g_names
 
 from .asynchronousTool import ASynchronousToolGlueGenerator
 
-from . import c_B_mapper
-
 isAsynchronous = True
-cBackend = None
 vdmBackend = None
 
 
@@ -82,15 +74,19 @@ class FromVDMToASN1SCC(RecursiveMapper):
         lines.append("    int i%s;\n" % uniqueId)
         lines.append("    UNWRAP_COLLECTION(col, %s);" % srcVDMVariable)
         lines.append("    int size%s = col->size;" % uniqueId)
+        lines.append("    int count%s = 0" % uniqueId)
         lines.append("    for(i%s=0; i%s<size%s; i%s++) {\n" % (uniqueId, uniqueId, uniqueId, uniqueId))
+        lines.append("if(col->value[i%s] != NULL){\n" % uniqueId)
         lines.extend(
-            ["        " + x
+            ["            " + x
              for x in self.Map(
                  "col->value[i%s]" % uniqueId,
                  "%s.arr[i%s]" % (destVar, uniqueId),
                  node._containedType,
                  leafTypeDict,
                  names)])
+        lines.append("            count%s++;\n" %uniqueId)
+        lines.append("        }\n")
         lines.append("    }\n")
         if isSequenceVariable(node):
             lines.append("    %s.nCount = size%s;\n" % (destVar, uniqueId))
@@ -249,7 +245,7 @@ class FromASN1SCCtoVDM(RecursiveMapper):
 
     def MapSet(self, srcVar: str, dstSDLVariable: str, node: AsnSequenceOrSet, leafTypeDict: AST_Leaftypes, names: AST_Lookup) -> List[str]:  # pylint: disable=invalid-sequence-index
         return self.MapSequence(srcVar, dstSDLVariable, node, leafTypeDict, names)  # pragma: nocover
-'''
+
     def MapChoice(self, srcVar, dstSDLVariable, node, leafTypeDict, names):
         lines = []  # type: List[str]
         childNo = 0
@@ -268,7 +264,7 @@ class FromASN1SCCtoVDM(RecursiveMapper):
             lines.append("    %s.present = %d;\n" % (dstSDLVariable, childNo))
             lines.append("}\n")
         return lines
-
+'''
     def MapSetOf(self, unused_srcVar, unused_dstSDLVariable, node, unused_leafTypeDict, unused_names):
         panic("The PragmaDev mapper does not support SETOF. Please use SEQUENCEOF instead (%s)" % node.Location())  # pragma: nocover
 '''
@@ -372,46 +368,35 @@ def OnStartup(modelingLanguage: str, asnFile: str, outputDir: str, maybeFVname: 
     global vdmBackend
     vdmBackend = VDM_GlueGenerator()
     vdmBackend.OnStartup(modelingLanguage, asnFile, outputDir, maybeFVname, useOSS)
-    global cBackend
-    cBackend = c_B_mapper.C_GlueGenerator()
-    cBackend.OnStartup("C", asnFile, outputDir, maybeFVname, useOSS)
 
 
 def OnBasic(nodeTypename: str, node: AsnBasicNode, leafTypeDict: AST_Leaftypes, names: AST_Lookup) -> None:
     vdmBackend.OnBasic(nodeTypename, node, leafTypeDict, names)
-    cBackend.OnBasic(nodeTypename, node, leafTypeDict, names)
 
 
 def OnSequence(nodeTypename: str, node: AsnSequence, leafTypeDict: AST_Leaftypes, names: AST_Lookup) -> None:
     vdmBackend.OnSequence(nodeTypename, node, leafTypeDict, names)
-    cBackend.OnSequence(nodeTypename, node, leafTypeDict, names)
 
 
 def OnSet(nodeTypename: str, node: AsnSet, leafTypeDict: AST_Leaftypes, names: AST_Lookup) -> None:
     vdmBackend.OnSet(nodeTypename, node, leafTypeDict, names)  # pragma: nocover
-    cBackend.OnSet(nodeTypename, node, leafTypeDict, names)  # pragma: nocover
 
 
 def OnEnumerated(nodeTypename: str, node: AsnEnumerated, leafTypeDict: AST_Leaftypes, names: AST_Lookup) -> None:
     vdmBackend.OnEnumerated(nodeTypename, node, leafTypeDict, names)
-    cBackend.OnEnumerated(nodeTypename, node, leafTypeDict, names)
 
 
 def OnSequenceOf(nodeTypename: str, node: AsnSequenceOf, leafTypeDict: AST_Leaftypes, names: AST_Lookup) -> None:
     vdmBackend.OnSequenceOf(nodeTypename, node, leafTypeDict, names)
-    cBackend.OnSequenceOf(nodeTypename, node, leafTypeDict, names)
 
 
 def OnSetOf(nodeTypename: str, node: AsnSetOf, leafTypeDict: AST_Leaftypes, names: AST_Lookup) -> None:
     vdmBackend.OnSetOf(nodeTypename, node, leafTypeDict, names)  # pragma: nocover
-    cBackend.OnSetOf(nodeTypename, node, leafTypeDict, names)  # pragma: nocover
 
 
 def OnChoice(nodeTypename: str, node: AsnChoice, leafTypeDict: AST_Leaftypes, names: AST_Lookup) -> None:
     vdmBackend.OnChoice(nodeTypename, node, leafTypeDict, names)
-    cBackend.OnChoice(nodeTypename, node, leafTypeDict, names)
 
 
 def OnShutdown(modelingLanguage: str, asnFile: str, maybeFVname: str) -> None:
     vdmBackend.OnShutdown(modelingLanguage, asnFile, maybeFVname)
-    cBackend.OnShutdown("C", asnFile, maybeFVname)
