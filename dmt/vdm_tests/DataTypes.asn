@@ -12,4 +12,8 @@ TSeq  ::= SEQUENCE {
     component2 MInt
 }
 
+MChoice ::= CHOICE{
+    m-Int INTEGER (0..20),
+    m-Bool BOOLEAN
+}
 END
