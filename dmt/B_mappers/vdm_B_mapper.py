@@ -195,7 +195,7 @@ class FromASN1SCCtoVDM(RecursiveMapper):
         uniqueId = self.UniqueID()
         limit = sourceSequenceLimit(node, srcVar)
         lines.append("    int i%s;\n" % uniqueId)
-        lines.append("    %s = newSeq(%s);\n", % (dstVDMVariable, limit))
+        lines.append("    %s = newSeq(%s);\n" % (dstVDMVariable, limit))
         lines.append("    UNWRAP_COLLECTION(col, %s);" % dstVDMVariable)
         lines.append("    for(i%s=0; i%s<%s; i%s++) {\n" % (uniqueId, uniqueId, limit, uniqueId))
         lines.extend(
