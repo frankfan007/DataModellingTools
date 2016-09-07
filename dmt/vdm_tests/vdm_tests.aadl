@@ -1,13 +1,3 @@
-SUBPROGRAM mytestsubsystemEmpty
-END mytestsubsystemEmpty;
-
-SUBPROGRAM IMPLEMENTATION mytestsubsystemEmpty.Vdm
-PROPERTIES
-	FV_Name => "mytestsubsystemEmpty_fv_Vdm";
-	Source_Language => Vdm;
-END mytestsubsystemEmpty.Vdm;
-
-
 SUBPROGRAM mytestsubsystem
 FEATURES
 	my_in_MInt:IN PARAMETER DataView::MInt {encoding=>UPER;};
@@ -28,10 +18,8 @@ FEATURES
     	my_in_MEnum:IN PARAMETER DataView::MEnum {encoding=>UPER;};
 	my_out_MEnum:OUT PARAMETER DataView::MEnum {encoding=>UPER;};
 
-
     	my_in_TSeq:IN PARAMETER DataView::TSeq {encoding=>UPER;};
 	my_out_TSeq:OUT PARAMETER DataView::TSeq {encoding=>UPER;};
-
 END mytestsubsystem;
 
 
