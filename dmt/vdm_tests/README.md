@@ -25,13 +25,15 @@ Run the generated code to test the B_mapper:
 
 `$ ./exe/exe`  
 
+Generate convert functions
+--------------------------
 
 This VDM B_mapper can be used for the generation the *convert* functions between ASN.1 and `vdm2c` C code for project outside the TASTE environment. To do this, in the following are listed the operations to follow:
 
 - Definition of the data type format in ASN.1 (e.g. `DataTypes.asn`)
 - Conversion of the ASN.1 definition `DataTypes.asn` into VDMPP, to this launch the `asn2vdm.sh` script:
 
-`$ asn2vdm.sh DataTypes.asn DataTypes.vdmpp
+`$ asn2vdm.sh DataTypes.asn DataTypes.vdmpp`
 
 - Launch the `vdm2c` for generating the C code from the VDMPP file (e.g. `DataTypes.vdmpp`) and copy the generated code into `output_dir`
 - Define a simple AADL, following the structure of `vdm-tests.aadl` where the SUBPROGRAM contains for each type defined in the ASN.1 (e.g. `DataTypes.asn`) one input parameter and one output parameter as reported below (type `NewType`):
