@@ -143,8 +143,8 @@ class FromVDMToASN1SCC(RecursiveMapper):
 
     def MapSet(self, srcVDMVariable: str, destVar: str, node: AsnSequenceOrSet, leafTypeDict: AST_Leaftypes, names: AST_Lookup) -> List[str]:  # pylint: disable=invalid-sequence-index
         return self.MapSequence(srcVDMVariable, destVar, node, leafTypeDict, names)  # pragma: nocover
-'''
-    def MapChoice(self, srcVDMVariable, destVar, node, leafTypeDict, names):
+
+    def MapChoice(self, srcSDLVariable, destVar, node, leafTypeDict, names):
         lines = []  # type: List[str]
         childNo = 0
         for child in node._members:
@@ -161,7 +161,7 @@ class FromVDMToASN1SCC(RecursiveMapper):
             lines.append("    %s.kind = %s;\n" % (destVar, self.CleanName(child[2])))
             lines.append("}\n")
         return lines
-
+'''
     def MapSetOf(self, unused_srcSDLVariable, unused_destVar, node, unused_leafTypeDict, unused_names):
         panic("The PragmaDev mapper does not support SETOF. Please use SEQUENCEOF instead (%s)" % node.Location())  # pragma: nocover
 '''
@@ -195,6 +195,7 @@ class FromASN1SCCtoVDM(RecursiveMapper):
         uniqueId = self.UniqueID()
         limit = sourceSequenceLimit(node, srcVar)
         lines.append("    int i%s;\n" % uniqueId)
+        lines.append("    %s = newSeq(%s);\n" % (dstVDMVariable, limit))
         lines.append("    UNWRAP_COLLECTION(col, %s);" % dstVDMVariable)
         lines.append("    for(i%s=0; i%s<%s; i%s++) {\n" % (uniqueId, uniqueId, limit, uniqueId))
         lines.extend(
@@ -250,10 +251,11 @@ class FromASN1SCCtoVDM(RecursiveMapper):
     def MapSet(self, srcVar: str, dstSDLVariable: str, node: AsnSequenceOrSet, leafTypeDict: AST_Leaftypes, names: AST_Lookup) -> List[str]:  # pylint: disable=invalid-sequence-index
         return self.MapSequence(srcVar, dstSDLVariable, node, leafTypeDict, names)  # pragma: nocover
 
-    def MapChoice(self, srcVar, dstSDLVariable, node, leafTypeDict, names):
+    def MapChoice(self, srcVar, dstVDMVariable, node, leafTypeDict, names):
         lines = []  # type: List[str]
         childNo = 0
         for child in node._members:
+            print(child)
             childNo += 1
             lines.append("%sif (%s.kind == %s) {\n" %
                          (self.maybeElse(childNo), srcVar, self.CleanName(child[2])))
@@ -261,11 +263,10 @@ class FromASN1SCCtoVDM(RecursiveMapper):
                 ['    ' + x
                  for x in self.Map(
                      srcVar + ".u." + self.CleanName(child[0]),
-                     "%s.__value.%s" % (dstSDLVariable, self.CleanName(child[0])),
+                     "%s" % (dstVDMVariable),
                      child[1],
                      leafTypeDict,
                      names)])
-            lines.append("    %s.present = %d;\n" % (dstSDLVariable, childNo))
             lines.append("}\n")
         return lines
 '''

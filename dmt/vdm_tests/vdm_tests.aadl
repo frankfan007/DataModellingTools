@@ -18,8 +18,6 @@ FEATURES
     	my_in_MEnum:IN PARAMETER DataView::MEnum {encoding=>UPER;};
 	my_out_MEnum:OUT PARAMETER DataView::MEnum {encoding=>UPER;};
 
-    	my_in_TSeq:IN PARAMETER DataView::TSeq {encoding=>UPER;};
-	my_out_TSeq:OUT PARAMETER DataView::TSeq {encoding=>UPER;};
 END mytestsubsystem;
 
 

@@ -47,8 +47,6 @@
 #define DataViewCLASS struct DataView*
 
 // The vtable ids
-#define CLASS_DataView__Z4vdm5EI 0
-#define CLASS_DataView__Z7vdm5funEI 1
 
 struct DataView
 {
@@ -92,6 +90,7 @@ struct DataView
 
 void DataView_free_fields(DataViewCLASS);
 DataViewCLASS DataView_Constructor(DataViewCLASS);
+
 
 
 #endif /* CLASSES_DataView_H_ */

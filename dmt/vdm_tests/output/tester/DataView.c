@@ -31,25 +31,6 @@ static void DataView_free(struct DataView *this)
  *
  --------------------------------- */
  
-/* DataTypes.vdmpp 31:10 */
- static  TVP _Z4vdm5EI(DataViewCLASS this, TVP a)	{
-/* DataTypes.vdmpp 32:24 */
- TVP ret_1 = vdmClone(vdmSum(a, newInt(1)));
-/* DataTypes.vdmpp 32:15 */
-return ret_1;
-}
-
-
-/* DataTypes.vdmpp 26:10 */
-TVP _Z7vdm5funEI(DataViewCLASS this, TVP a)	{
-/* DataTypes.vdmpp 27:20 */
- TVP ret_2 = vdmSum(a, newInt(1));
-/* DataTypes.vdmpp 27:20 */
- printf("%d", a->value.intVal);
-return ret_2;
-}
-
-
 
  void DataView_const_init()	{
 
@@ -87,12 +68,7 @@ return ;
  --------------------------------- */
  
 // VTable for this class
- static  struct VTable VTableArrayForDataView  [] ={
-
-{0,0,((VirtualFunctionPointer) _Z4vdm5EI),},
-{0,0,((VirtualFunctionPointer) _Z7vdm5funEI),},
-				
-}  ;
+ static  struct VTable VTableArrayForDataView  [0]  ;
 
 // Overload VTables
 
