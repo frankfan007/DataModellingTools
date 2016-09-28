@@ -6,6 +6,7 @@ MSeqI  ::= SEQUENCE SIZE((5..10)) OF INTEGER(0..20)
 MSeqB  ::= SEQUENCE SIZE((5..10)) OF INTEGER(0..20)
 MOct   ::= OCTET STRING(SIZE(1..40))
 MEnum  ::= ENUMERATED{slave(0), master(1)}
+MSeqS  ::= SEQUENCE (SIZE (5..10)) OF SEQUENCE (SIZE(5)) OF INTEGER(0..20)
 
 TSeq  ::= SEQUENCE {
     component1 MInt,

@@ -15,8 +15,11 @@ FEATURES
     	my_in_MOct:IN PARAMETER DataView::MOct {encoding=>UPER;};
 	my_out_MOct:OUT PARAMETER DataView::MOct {encoding=>UPER;};
 
-    	my_in_MEnum:IN PARAMETER DataView::MEnum {encoding=>UPER;};
+     	my_in_MEnum:IN PARAMETER DataView::MEnum {encoding=>UPER;};
 	my_out_MEnum:OUT PARAMETER DataView::MEnum {encoding=>UPER;};
+
+   	my_in_MSeqS:IN PARAMETER DataView::MSeqS {encoding=>UPER;};
+	my_out_MSeqS:OUT PARAMETER DataView::MSeqS {encoding=>UPER;};
 
 END mytestsubsystem;
 
