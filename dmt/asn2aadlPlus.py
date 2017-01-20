@@ -92,8 +92,8 @@ def calculateForNativeAndASN1SCC(absASN1SCCpath, autosrc, names, inputFiles):
         for line in os.popen("%s -AdaUses %s" % (absASN1SCCpath, '" "'.join(inputASN1files))):
             g_AdaPackageNameOfType[line.split(':')[0]] = line.split(':')[1].rstrip()
     else:
-        mysystem("mono %s -wordSize 8 -c -uPER -o \"%s\" %s %s" % (absASN1SCCpath, autosrc, acn, '"' + '" "'.join(inputFiles) + '"'))
-        for line in os.popen('mono %s -AdaUses "%s"' % (absASN1SCCpath, '" "'.join(inputASN1files))):
+        mysystem("%s -wordSize 8 -c -uPER -o \"%s\" %s %s" % (absASN1SCCpath, autosrc, acn, '"' + '" "'.join(inputFiles) + '"'))
+        for line in os.popen(' %s -AdaUses "%s"' % (absASN1SCCpath, '" "'.join(inputASN1files))):
             g_AdaPackageNameOfType[line.split(':')[0]] = line.split(':')[1].rstrip()
 
     msgEncoderFile = open(autosrc + os.sep + base + ".stats.c", 'w')
@@ -129,7 +129,6 @@ def calculateForNativeAndASN1SCC(absASN1SCCpath, autosrc, names, inputFiles):
     msgEncoderFile.close()
 
     # Code generation - asn1c part
-
     # Create a dictionary to lookup the asn-types from their corresponding c-type
     namesDict = {}
     for asnTypename in list(names.keys()):
@@ -152,20 +151,23 @@ def calculateForNativeAndASN1SCC(absASN1SCCpath, autosrc, names, inputFiles):
         # Compile the generated C-file with each compiler
         pwd = os.getcwd()
         os.chdir(autosrc)
+        #path_to_compiler = spawn.find_executable(cc)
         path_to_compiler = spawn.find_executable(cc.decode('utf-8'))
         if path_to_compiler is None:
             continue
-
         for cfile in os.listdir("."):
             if cfile.endswith(".c"):
                 if mysystem('%s -c -std=c99 -I. "%s" 2>"%s.stats.err"' % (path_to_compiler, cfile, base)) != 0:
                     panic("Compilation of generated sources failed - is %s installed?\n"
                           "(report inside '%s')\n" % (cc, os.path.join(autosrc, base + ".stats.err")))
-
         os.chdir(pwd)
 
         # Receive the size information for each value from the compiled object file
-        for line in os.popen("nm --print-size " + autosrc + os.sep + base + ".stats.o").readlines():
+        if platform.system() == "Darwin":
+            nm = "gnm"
+        else:
+            nm = "nm"
+        for line in os.popen( nm + " --print-size " + autosrc + os.sep + base + ".stats.o").readlines():
             try:
                 (dummy, size, dummy2, msg) = line.split()
             except ValueError:

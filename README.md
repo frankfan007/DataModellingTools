@@ -20,13 +20,28 @@ For more details, visit the [TASTE site](https://taste.tuxfamily.org/).
 Installation
 ------------
 
-For using the tools, this should suffice:
+Linux Dependencies:
 
     $ sudo apt-get install libxslt1-dev libxml2-dev zlib1g-dev python3-pip
+
+MacOS Dependencies:
+
+    $ brew update
+    $ brew upgrade
+    $ brew install libxslt python3 lzlib binutils
+
+Installation command:
+
+    $ cd DataModellingTools
     $ pip3 install --user --upgrade .
 
-For developers
---------------
+MacOS users:
+
+Add to your `PATH` into the `.bash_profile` file `$HOME/Library/Python/x.y/bin` where `x.y`specifies the current version of Python3 installed.
+
+### For developers
+
+Installation command
 
     $ pip3 install --user --upgrade --editable .
 
@@ -44,11 +59,8 @@ What is packaged:
 
 - **commonPy** (*library*)
 
-    Contains the basic API for parsing ASN.1 (via invocation of 
-    [ASN1SCC](https://github.com/ttsiodras/asn1scc) and simplification
-    of the generated XML AST representation to the Python classes
-    inside `asnAST.py`. The class diagram with the AST classes
-    is [packaged in the code](dmt/commonPy/asnAST.py#L42).
+    Contains the basic API for parsing ASN.1 (via invocation of
+    [ASN1SCC](https://github.com/ttsiodras/asn1scc) and simplification of the generated XML AST representation to the Python classes inside `asnAST.py`. The class diagram with the AST classes is [packaged in the code](dmt/commonPy/asnAST.py#L42).
 
 - **asn2aadlPlus** (*utility*)
 
@@ -60,7 +72,7 @@ What is packaged:
 
     Reads the ASN.1 specification of the exchanged messages, and generates
     the semantically equivalent Modeling tool/Modeling language declarations
-    (e.g. SCADE/Lustre, Matlab/Simulink, etc). 
+    (e.g. SCADE/Lustre, Matlab/Simulink, etc).
 
     The actual mapping logic exists in plugins, called *A mappers*
     (`simulink_A_mapper.py` handles Simulink/RTW, `scade6_A_mapper.py`
@@ -82,7 +94,7 @@ For bug reports, please use the Issue Tracker; for any other communication,
 contact me at:
 
     Thanassis Tsiodras
-    Real-time Embedded Software Engineer 
+    Real-time Embedded Software Engineer
     System, Software and Technology Department
     European Space Agency
 
