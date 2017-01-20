@@ -89,10 +89,10 @@ def calculateForNativeAndASN1SCC(absASN1SCCpath, autosrc, names, inputFiles):
     # Spawn ASN1SCC.exe compiler
     if platform.system() == "Windows":
         mysystem("%s -wordSize 8 -c -uPER -o \"%s\" %s %s" % (absASN1SCCpath, autosrc, acn, '"' + '" "'.join(inputFiles) + '"'))
-        for line in os.popen("%s -AdaUses %s" % (absASN1SCCpath, '" "'.join(inputASN1files))):
+        for line in os.popen("mono %s -AdaUses %s" % (absASN1SCCpath, '" "'.join(inputASN1files))):
             g_AdaPackageNameOfType[line.split(':')[0]] = line.split(':')[1].rstrip()
     else:
-        mysystem("%s -wordSize 8 -c -uPER -o \"%s\" %s %s" % (absASN1SCCpath, autosrc, acn, '"' + '" "'.join(inputFiles) + '"'))
+        mysystem("mono %s -wordSize 8 -c -uPER -o \"%s\" %s %s" % (absASN1SCCpath, autosrc, acn, '"' + '" "'.join(inputFiles) + '"'))
         for line in os.popen(' %s -AdaUses "%s"' % (absASN1SCCpath, '" "'.join(inputASN1files))):
             g_AdaPackageNameOfType[line.split(':')[0]] = line.split(':')[1].rstrip()
 
@@ -151,8 +151,8 @@ def calculateForNativeAndASN1SCC(absASN1SCCpath, autosrc, names, inputFiles):
         # Compile the generated C-file with each compiler
         pwd = os.getcwd()
         os.chdir(autosrc)
-        #path_to_compiler = spawn.find_executable(cc)
-        path_to_compiler = spawn.find_executable(cc.decode('utf-8'))
+        path_to_compiler = spawn.find_executable(cc)
+        #path_to_compiler = spawn.find_executable(cc.decode('utf-8'))
         if path_to_compiler is None:
             continue
         for cfile in os.listdir("."):
