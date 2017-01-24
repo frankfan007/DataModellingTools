@@ -28,7 +28,7 @@ MacOS Dependencies:
 
     $ brew update
     $ brew upgrade
-    $ brew install libxslt python3 lzlib binutils libantlr3c
+    $ brew install libxslt python3 lzlib binutils libantlr3c wget
     $ wget -O - -q https://github.com/ttsiodras/DataModellingTools/files/335591/antlr-2.7.7.tar.gz | tar zxvf - ; cd antlr-2.7.7/lib/python ; pip2 install . 
 
 Installation command:
