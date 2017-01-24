@@ -86,14 +86,14 @@ def calculateForNativeAndASN1SCC(absASN1SCCpath, autosrc, names, inputFiles):
     acn = " -ACN " if any(x.lower().endswith(".acn") for x in inputFiles) else ""
     inputASN1files = [x for x in inputFiles if not x.lower().endswith('.acn')]
 
-    # Spawn ASN1SCC.exe compiler
-    if platform.system() == "Windows":
+    # Spawn ASN1SCC.exe compiler - for MacOS define a new sh file calling mono Asn1f2.exe
+    if platform.system() == "Windows" or platform.system() == "Darwin":
         mysystem("%s -wordSize 8 -c -uPER -o \"%s\" %s %s" % (absASN1SCCpath, autosrc, acn, '"' + '" "'.join(inputFiles) + '"'))
-        for line in os.popen("mono %s -AdaUses %s" % (absASN1SCCpath, '" "'.join(inputASN1files))):
+        for line in os.popen("%s -AdaUses %s" % (absASN1SCCpath, '" "'.join(inputASN1files))):
             g_AdaPackageNameOfType[line.split(':')[0]] = line.split(':')[1].rstrip()
     else:
         mysystem("mono %s -wordSize 8 -c -uPER -o \"%s\" %s %s" % (absASN1SCCpath, autosrc, acn, '"' + '" "'.join(inputFiles) + '"'))
-        for line in os.popen(' %s -AdaUses "%s"' % (absASN1SCCpath, '" "'.join(inputASN1files))):
+        for line in os.popen('mono  %s -AdaUses "%s"' % (absASN1SCCpath, '" "'.join(inputASN1files))):
             g_AdaPackageNameOfType[line.split(':')[0]] = line.split(':')[1].rstrip()
 
     msgEncoderFile = open(autosrc + os.sep + base + ".stats.c", 'w')
@@ -143,7 +143,7 @@ def calculateForNativeAndASN1SCC(absASN1SCCpath, autosrc, names, inputFiles):
         pipe = Popen("find-supported-compilers", stdout=PIPE).stdout
         g_platformCompilers = pipe.read().splitlines()
     except OSError as err:
-        print('Not running in a TASTE environment: {}\nUsing GCC only for computing sizeofs'.format(str(err)))
+        print('Not running in a TASTE Environment: {}\nUsing GCC only for computing sizeofs'.format(str(err)))
         g_platformCompilers = ['gcc']
     # Get the maximum size of each asn1type from all platform compilers
     messageSizes = {}
