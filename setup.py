@@ -39,6 +39,7 @@ setup(
     entry_points={
         'console_scripts': [
             'asn2aadlPlus = dmt.asn2aadlPlus:main',
+            'asn2aadlVDM = dmt.asn2aadlVDM:main',
             'asn2dataModel = dmt.asn2dataModel:main',
             'aadl2glueC = dmt.aadl2glueC:main',
             'msgPrinter = dmt.msgPrinter:main',

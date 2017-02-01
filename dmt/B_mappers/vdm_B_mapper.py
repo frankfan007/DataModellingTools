@@ -116,7 +116,7 @@ class FromVDMToASN1SCC(RecursiveMapper):
 
     def MapEnumerated(self, srcVDMVariable: str, destVar: str, node: AsnEnumerated, __: AST_Leaftypes, ___: AST_Lookup) -> List[str]:  # pylint: disable=invalid-sequence-index
         lines = []  # type: List[str]
-        lines.append("switch(%s->value.intVal) {\n" %srcVDMVariable)
+        lines.append("switch(%s->value.quoteVal) {\n" %srcVDMVariable)
         for m in node._members:
             lines.append("    case QUOTE_%s:\n" % m[0].upper())
             lines.append("        (%s) = %s;\n" % (destVar, m[1]))
