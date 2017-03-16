@@ -3,7 +3,7 @@ VDM Test directory
 
     - DataTypes.asn Definition of datatypes
     - DataView.aadl File generated from DataTypes.asn through asn2aadlPlus
-    - vdm-tests.aadl Simple AADL architecture to test the VDM B_mapper
+    - vdm-tests.aadl Simple AADL architecture to test the VDM B_mapper, now this file can be generated through the script $asn2aadlVDM$ part of DataModellingTools installation
     - output/tester Directory containing the VDM2C Native Library and testing code
 
 
@@ -11,7 +11,7 @@ Run the code generation:
 
 `$ ./gen_mapping.sh`
 
-Compile the generated code:
+The directory `output` contains an example of simple test code to verify the correcteness of the generated code:
 
 ```
 $ cd output 
@@ -30,13 +30,20 @@ Generate convert functions
 
 This VDM B_mapper can be used for the generation the *convert* functions between ASN.1 and `vdm2c` C code for project outside the TASTE environment. To do this, in the following are listed the operations to follow:
 
-- Definition of the data type format in ASN.1 (e.g. `DataTypes.asn`)
-- Conversion of the ASN.1 definition `DataTypes.asn` into VDMPP, to this launch the `asn2vdm.sh` script:
+1. Definition of the data type format in ASN.1 (e.g. `DataTypes.asn`)
+2. Conversion of the ASN.1 definition `DataTypes.asn` into VDMPP, to this launch the `asn2vdm.sh` script:
 
 `$ asn2vdm.sh DataTypes.asn DataTypes.vdmpp`
 
-- Launch the `vdm2c` for generating the C code from the VDMPP file (e.g. `DataTypes.vdmpp`) and copy the generated code into `output_dir`
-- Define a simple AADL, following the structure of `vdm-tests.aadl` where the SUBPROGRAM contains for each type defined in the ASN.1 (e.g. `DataTypes.asn`) one input parameter and one output parameter as reported below (type `NewType`):
+3. Launch the `vdm2c` for generating the C code from the VDMPP file (e.g. `DataTypes.vdmpp`) and copy the generated code into `output_dir`
+
+4. Generate the AADL file required from the framework for the generation of the mapping functions between the TVP and ASN.1;
+the genrated AADL architecture is characterized by the following structure: 
+  - SUBPROGRAM containing for each type defined in the ASN.1 file (e.g. `DataTypes.asn`) one input parameter and one output parameter as reported below (type `NewType`):
+  - SUBPROGRAM IMPLEMENTATION describing the implementation in the source language VDM.
+
+`$ asn2aadlVDM DataTypes.asn VDM_architecture.aadl`
+
 
 ```
 SUBPROGRAM mysub
@@ -52,11 +59,14 @@ PROPERTIES
 END mysub.Vdm
 ```
 
-- Launch the TASTE utilities:
+5. Generation of the mapping function between the TVP and ASN.1 C representation
+
+`$ aadl2glueC -o output_dir vdm_architecture.aadl DataView.aadl`
+
+Summary of the TASTE utilities involved in the process:
 ```
 $ asn2aadlPlus DataTypes.asn DataView.aadl
-$ aadl2glueC -o output_dir vdm_tests.aadl DataView.aadl
+$ asn2aadlVDM  DataTypes.asn vdm_architecture.aadl
+$ aadl2glueC -o output_dir vdm_architecture.aadl DataView.aadl
 $ asn1.exe -c -uPER -typePrefix "asn1Scc" -o output_dir DataTypes.asn
 ```
-
-
