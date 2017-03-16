@@ -1,15 +1,15 @@
 VDM Test directory
 ------------------
 
-    - DataTypes.asn Definition of datatypes
-    - DataView.aadl File generated from DataTypes.asn through asn2aadlPlus
-    - vdm-tests.aadl Simple AADL architecture to test the VDM B_mapper, now this file can be generated through the script $asn2aadlVDM$ part of DataModellingTools installation
-    - output/tester Directory containing the VDM2C Native Library and testing code
+- DataTypes.asn Definition of datatypes
+- DataView.aadl File generated from DataTypes.asn through asn2aadlPlus
+- vdm-tests.aadl Simple AADL architecture to test the VDM B_mapper, now this file can be generated through the script `asn2aadlVDM` part of DataModellingTools installation
+- output/tester Directory containing the VDM2C Native Library and testing code
 
 
 Run the code generation:
 
-`$ ./gen_mapping.sh`
+`$ ./gen_mapping.sh -i asn_input_file -o output_dir`
 
 The directory `output` contains an example of simple test code to verify the correcteness of the generated code:
 
@@ -38,9 +38,9 @@ This VDM B_mapper can be used for the generation the *convert* functions between
 3. Launch the `vdm2c` for generating the C code from the VDMPP file (e.g. `DataTypes.vdmpp`) and copy the generated code into `output_dir`
 
 4. Generate the AADL file required from the framework for the generation of the mapping functions between the TVP and ASN.1;
-the genrated AADL architecture is characterized by the following structure: 
-  - SUBPROGRAM containing for each type defined in the ASN.1 file (e.g. `DataTypes.asn`) one input parameter and one output parameter as reported below (type `NewType`):
-  - SUBPROGRAM IMPLEMENTATION describing the implementation in the source language VDM.
+the generated AADL architecture is characterized by the following structure: 
+    - SUBPROGRAM containing for each type defined in the ASN.1 file (e.g. `DataTypes.asn`) one input parameter and one output parameter as reported below (type `NewType`):
+    - SUBPROGRAM IMPLEMENTATION describing the implementation in the source language VDM.
 
 `$ asn2aadlVDM DataTypes.asn VDM_architecture.aadl`
 
