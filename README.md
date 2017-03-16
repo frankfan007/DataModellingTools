@@ -69,6 +69,11 @@ What is packaged:
     declarations, that are used by [Ocarina](https://github.com/OpenAADL/ocarina)
     to generate the executable containers.
 
+- **asn2aadlVDM** (*utility*)
+
+    Create an AADL architecture from the ASN.1 grammars used to trigger the generation of 
+    converting functions between the VDM's TVP C representation and ASN.1 C representation.
+
 - **asn2dataModel** (*utility*)
 
     Reads the ASN.1 specification of the exchanged messages, and generates
