@@ -16,7 +16,7 @@ setup(
     author='Thanassis Tsiodras',
     author_email='Thanassis.Tsiodras@esa.int',
     description='TASTE Data Modelling Technologies based on ASN.1',
-    long_description=open('README.md').read(),
+    #long_description=open('README.md').read(),
     include_package_data=True,
     url='http://taste.tuxfamily.org',
     classifiers=[
