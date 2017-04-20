@@ -33,13 +33,14 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "VdmDefines.h"
 
 //Eclipse hack
 #if !defined(va_arg)
 #define va_arg(ap,TVP) NULL //just for Eclipse must not be defined
 #endif
 
-#define vdmFree recursiveFree
+#define recursiveFree vdmFree
 
 //#define ALLOC(t,n) (t *) malloc((n)*sizeof(t))
 
@@ -53,13 +54,24 @@ typedef enum
 	VDM_REAL,
 	VDM_RAT,
 	VDM_CHAR,
+#ifndef NO_SETS
 	VDM_SET,
+#endif
+#ifndef NO_SEQS
 	VDM_SEQ,
+#endif
+#ifndef NO_MAPS
 	VDM_MAP,
+#endif
+#ifndef NO_PRODUCTS
 	VDM_PRODUCT,
+#endif
 	VDM_QUOTE,
 	//	VDM_OPTIONAL, think we will handle this with a TVP == NULL
+#ifndef NO_RECORDS
 	VDM_RECORD,
+#endif
+	VDM_TOKEN,
 	VDM_CLASS
 } vdmtype;
 
@@ -82,13 +94,14 @@ typedef union TypedValueType
 	char charVal;
 
 	//VDM_QUOTE
-	unsigned int uintVal;
+	unsigned int quoteVal;
 } TypedValueType;
 
 
 struct TypedValue
 {
 	vdmtype type;
+	struct TypedValue **ref_from;
 	TypedValueType value;
 };
 
@@ -96,14 +109,40 @@ struct TypedValue
 
 struct Collection
 {
-	struct TypedValue** value;
+	TVP* value;
 	int size;
 };
 
 int vdmCollectionSize(TVP collection);
 TVP vdmCollectionIndex(TVP collection,int index);
 
+
+#if defined(NO_SEQS) && defined(NO_SETS) && defined(NO_PRODUCTS)
+#define ASSERT_CHECK_COLLECTION(s) assert(true)
+
+#elif defined(NO_SEQS) && defined(NO_SETS) && !defined(NO_PRODUCTS)
+#define ASSERT_CHECK_COLLECTION(s) assert((s->type == VDM_PRODUCT) &&"Value is not a collection")
+
+#elif defined(NO_SEQS) && !defined(NO_SETS) && defined(NO_PRODUCTS)
+#define ASSERT_CHECK_COLLECTION(s) assert((s->type == VDM_SET) &&"Value is not a collection")
+
+#elif defined(NO_SEQS) && !defined(NO_SETS) && !defined(NO_PRODUCTS)
+#define ASSERT_CHECK_COLLECTION(s) assert((s->type == VDM_SET || s->type == VDM_PRODUCT) &&"Value is not a collection")
+
+#elif !defined(NO_SEQS) && defined(NO_SETS) && defined(NO_PRODUCTS)
+#define ASSERT_CHECK_COLLECTION(s) assert((s->type == VDM_SEQ) &&"Value is not a collection")
+
+#elif !defined(NO_SEQS) && defined(NO_SETS) && !defined(NO_PRODUCTS)
+#define ASSERT_CHECK_COLLECTION(s) assert((s->type == VDM_SEQ || s->type == VDM_PRODUCT) &&"Value is not a collection")
+
+#elif !defined(NO_SEQS) && !defined(NO_SETS) && defined(NO_PRODUCTS)
+#define ASSERT_CHECK_COLLECTION(s) assert((s->type == VDM_SEQ || s->type == VDM_SET) &&"Value is not a collection")
+
+#elif !defined(NO_SEQS) && !defined(NO_SETS) && !defined(NO_PRODUCTS)
 #define ASSERT_CHECK_COLLECTION(s) assert((s->type == VDM_SEQ || s->type == VDM_SET || s->type == VDM_PRODUCT) &&"Value is not a collection")
+
+#endif
+
 #define UNWRAP_COLLECTION(var,collection) struct Collection* var = (struct Collection*)collection->value.ptr
 #define UNWRAP_PRODUCT(var,product) struct Collection* var = (struct Collection*)product->value.ptr
 
@@ -113,38 +152,48 @@ struct OptionalType
 	struct TypedValue value;
 };
 
-
-
-struct TypedValue* newTypeValue(vdmtype type, TypedValueType value);
+TVP newTypeValue(vdmtype type, TypedValueType value);
 
 
 // Basic - these should inline
-struct TypedValue* newInt(int x);
-struct TypedValue* newInt1(int x);
-struct TypedValue* newNat(int x);
-struct TypedValue* newNat1(int x);
-struct TypedValue* newBool(bool x);
-struct TypedValue* newReal(double x);
-struct TypedValue* newChar(char x);
-struct TypedValue* newQuote(unsigned int x);
+TVP newInt(int x);
+TVP newBool(bool x);
+TVP newReal(double x);
+TVP newChar(char x);
+TVP newQuote(unsigned int x);
+TVP newToken(TVP x);
+
+
 
 
 // Complex
 
 
-
 //utils
-struct TypedValue* newCollectionWithValues(vdmtype type,size_t size,TVP* elements);
-struct TypedValue* newCollection(size_t size, vdmtype type);
+TVP newCollectionWithValues(size_t size, vdmtype type, TVP* elements);
+TVP newCollection(size_t size, vdmtype type);
+TVP newCollectionGC(size_t size, vdmtype type, TVP *from);
+TVP newCollectionWithValuesGC(size_t size, vdmtype type, TVP* elements, TVP *from);
 
-struct TypedValue* vdmClone(struct TypedValue* x);
-bool equals(struct TypedValue* a, struct TypedValue* b);
-TVP vdmEquals(struct TypedValue* a, struct TypedValue* b);
-TVP vdmInEquals(struct TypedValue* a, struct TypedValue* b);
+TVP vdmClone(TVP x);
+
+bool equals(TVP a, TVP b);
+TVP vdmEquals(TVP a, TVP b);
+TVP vdmEqualsGC(TVP a, TVP b, TVP *from);
+TVP vdmInEquals(TVP a, TVP b);
+TVP vdmInEqualsGC(TVP a, TVP b, TVP *from);
 bool collectionEqual(TVP col1,TVP col2);
 
-void recursiveFree(struct TypedValue* ptr);
+void vdmFree(TVP ptr);
 
+extern TVP newSetVar(size_t size,...);
+
+#ifndef NO_MAPS
+extern TVP vdmMapEquals(TVP map1, TVP map2);
+#endif
+
+extern TVP vdmSetEquals(TVP set1, TVP set2);
+extern void remove_allocd_mem_node_by_location(TVP loc);
 
 
 #endif /* TYPEDVALUE_H_ */
