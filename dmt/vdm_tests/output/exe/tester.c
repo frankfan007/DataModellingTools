@@ -1,4 +1,4 @@
-#include <stdio.h>
+
 #include "../tester/Vdm_ASN1_Types.h"
 
 int main(){
@@ -56,16 +56,16 @@ int main(){
             printf("%d ", mseq_i.arr[i]);
     printf("\n");
 
-    // TVP mseq_i_vdm = newSeq(size);
+    TVP mseq_i_vdm;// = newSeq(size);
     Convert_MSeqI_from_ASN1SCC_to_VDM(&mseq_i_vdm, &mseq_i);
     UNWRAP_COLLECTION(col, mseq_i_vdm);
     printf("VDM Dest MSeqI\n");
     for(int i=0; i < mseq_i.nCount; i++)
         printf("%d ", ((TVP) col->value[i])->value.intVal);   
     printf("\n");
-    col->value[3]->value.intVal = 10;
+    col->value[2]->value.intVal = 10;
     printf("VDM Source MSeqI\n");
-    for(int i=0; i < size; i++)
+    for(int i=0; i < 4; i++)
         if (col->value[i] != NULL)
             printf("%d ", ((TVP) col->value[i])->value.intVal);   
     printf("\n");
@@ -83,7 +83,7 @@ int main(){
     for(int i=0; i < size; i++ )
         printf("%d ", mseq_b.arr[i]);
     printf("\n");
-    // TVP mseq_b_vdm = newSeq(size);
+    TVP mseq_b_vdm;// = newSeq(size);
     Convert_MSeqB_from_ASN1SCC_to_VDM(&mseq_b_vdm, &mseq_b);
     UNWRAP_COLLECTION(col_b, mseq_b_vdm);
     printf("VDM Dest MSeqB\n");
@@ -138,10 +138,10 @@ int main(){
 
     // FUNCTION CALL
     
-    DataViewCLASS test_class;
-    TVP vdm_mint_ret = _Z7vdm5funEI(test_class, vdm_mint);
-    printf("Mint before: %d\n", vdm_mint->value.intVal);
-    printf("MInt after: %f\n", vdm_mint_ret->value.doubleVal);
+//    DataViewCLASS test_class;
+//    TVP vdm_mint_ret = _Z7vdm5funEI(test_class, vdm_mint);
+//    printf("Mint before: %d\n", vdm_mint->value.intVal);
+//    printf("MInt after: %f\n", vdm_mint_ret->value.doubleVal);
 
     return 0;
 }
