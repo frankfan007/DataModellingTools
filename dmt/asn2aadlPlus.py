@@ -152,8 +152,8 @@ def calculateForNativeAndASN1SCC(absASN1SCCpath, autosrc, names, inputFiles):
         print(cc)
         pwd = os.getcwd()
         os.chdir(autosrc)
-        #path_to_compiler = spawn.find_executable(cc)
-        path_to_compiler = spawn.find_executable(cc.decode('utf-8'))
+        path_to_compiler = spawn.find_executable(cc)
+        #path_to_compiler = spawn.find_executable(cc.decode('utf-8'))
         if path_to_compiler is None:
             continue
         for cfile in os.listdir("."):
