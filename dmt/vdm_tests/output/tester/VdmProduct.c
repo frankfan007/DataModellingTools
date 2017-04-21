@@ -27,20 +27,62 @@
  *      Author: kel
  */
 
+#include <stdarg.h>
 #include "VdmProduct.h"
+
+#ifndef NO_PRODUCTS
 
 #define ASSERT_CHECK(s) assert(s->type == VDM_PRODUCT && "Value is not a product")
 
 
-struct TypedValue* newProduct(size_t size)
+TVP newProduct(size_t size)
 {
 	return newCollection(size, VDM_PRODUCT);
 }
 
-struct TypedValue* newProductWithValues(size_t size,TVP* elements)
+
+TVP newProductWithValues(size_t size,TVP* elements)
 {
-	return newCollectionWithValues(VDM_PRODUCT,size,elements);
+	return newCollectionWithValues(size, VDM_PRODUCT, elements);
 }
+
+
+TVP newProductVar(size_t size, ...)
+{
+	TVP elements[size];
+
+	va_list ap;
+	va_start(ap, size);
+
+	for (int i = 0; i < size; i++)
+	{
+		TVP arg = va_arg(ap, TVP);
+		elements[i]=arg;
+	}
+	va_end(ap);
+
+	return newCollectionWithValues(size, VDM_PRODUCT, elements);
+}
+
+
+
+TVP newProductVarGC(size_t size, TVP *from, ...)
+{
+	TVP elements[size];
+
+	va_list ap;
+	va_start(ap, from);
+
+	for (int i = 0; i < size; i++)
+	{
+		TVP arg = va_arg(ap, TVP);
+		elements[i]=arg;
+	}
+	va_end(ap);
+
+	return newCollectionWithValuesGC(size, VDM_PRODUCT, elements, from);
+}
+
 
 TVP productGet(TVP product, int index)
 {
@@ -51,6 +93,18 @@ TVP productGet(TVP product, int index)
 	assert(index-1>=0 && index-1<col->size && "invalid index");
 	return vdmClone(col->value[index-1]);
 }
+
+
+TVP productGetGC(TVP product, int index, TVP *from)
+{
+	ASSERT_CHECK(product);
+
+	UNWRAP_PRODUCT(col,product);
+
+	assert(index-1>=0 && index-1<col->size && "invalid index");
+	return vdmCloneGC(col->value[index-1], from);
+}
+
 
 void productSet(TVP product, int index, TVP val)
 {
@@ -63,7 +117,7 @@ void productSet(TVP product, int index, TVP val)
 	TVP old = col->value[index-1];
 	if(old !=NULL)
 	{
-		recursiveFree(old);
+		vdmFree(old);
 	}
 	col->value[index-1]=vdmClone(val);
 }
@@ -76,3 +130,5 @@ void productSet(TVP product, int index, TVP val)
 //
 //	return newBool(collectionEqual(product,product2));
 //}
+
+#endif /* NO_PRODUCTS */

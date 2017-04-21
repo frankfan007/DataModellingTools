@@ -30,7 +30,6 @@
 #ifndef LIB_VDMRECORD_H_
 #define LIB_VDMRECORD_H_
 
-#include "TypedValue.h"
 
 typedef bool (*vdmRecordEqualityFunction)(TVP a, TVP b);
 
@@ -39,14 +38,16 @@ typedef bool (*vdmRecordEqualityFunction)(TVP a, TVP b);
 #define RECORD_FIELD_ACCESS(record,recordType,field,var) TVP var = NULL;{ASSERT_CHECK_RECORD(record);UNWRAP_RECORD(ar,record);var=vdmClone(((recordType)ar)->field);}
 #define RECORD_FIELD_SET(record,recordType,field,value) {ASSERT_CHECK_RECORD(record);UNWRAP_RECORD(ar,record);((recordType)ar)->field=vdmClone(value);}
 
+#ifndef NO_RECORDS
+
 struct RecordType
 {
 	void* value;
 	int recordId;
 	freeVdmClassFunction freeRecord;//TODO move to global map
 	vdmRecordEqualityFunction equalFun; //TODO move to global map
-	struct TypedValue* (*vdmCloneFun)(TVP self);
+	TVP (*vdmCloneFun)(TVP self);
 };
 
-
+#endif /* NO_RECORDS */
 #endif /* LIB_VDMRECORD_H_ */
