@@ -2,6 +2,7 @@
 #include "../tester/Vdm_ASN1_Types.h"
 
 int main(){
+
     /*
      * Tester.c is used to test the generated code functions.
      * The tests provided are the following:
@@ -56,7 +57,7 @@ int main(){
             printf("%d ", mseq_i.arr[i]);
     printf("\n");
 
-    TVP mseq_i_vdm;// = newSeq(size);
+    TVP mseq_i_vdm;// = newSeqVar(size);
     Convert_MSeqI_from_ASN1SCC_to_VDM(&mseq_i_vdm, &mseq_i);
     UNWRAP_COLLECTION(col, mseq_i_vdm);
     printf("VDM Dest MSeqI\n");
@@ -119,7 +120,7 @@ int main(){
     asn1SccMOct moct = (asn1SccMOct){.arr = "test_str", .nCount=sizeof("test_str")};
     printf("ASN1SCC Source MOct %s\n", moct.arr);
     size = sizeof(moct.arr)/sizeof(moct.arr[0]);
-    TVP moct_vdm = newSeq(moct.nCount);
+    TVP moct_vdm = newSeqVar(moct.nCount);
     Convert_MOct_from_ASN1SCC_to_VDM(&moct_vdm, &moct);
     UNWRAP_COLLECTION(col_moct, moct_vdm);
     printf("VDM Dest MOct: ");
@@ -142,6 +143,5 @@ int main(){
 //    TVP vdm_mint_ret = _Z7vdm5funEI(test_class, vdm_mint);
 //    printf("Mint before: %d\n", vdm_mint->value.intVal);
 //    printf("MInt after: %f\n", vdm_mint_ret->value.doubleVal);
-
     return 0;
 }
