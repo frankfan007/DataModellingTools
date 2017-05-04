@@ -1,4 +1,3 @@
-
 #include "../tester/Vdm_ASN1_Types.h"
 
 int main(){
@@ -25,24 +24,23 @@ int main(){
      */
 
     // INTEGER
-    TVP seq;
-    seq = newSeqVarToGrow(0, 4);
-    int sizet = (vdmSeqLen(seq))->value.intVal;
-    printf("%d\n", sizet);
+    //TVP seq;
+    //seq = newSeqVarToGrow(0, 4);
+    //int sizet = (vdmSeqLen(seq))->value.intVal;
+    //printf("%d\n", sizet);
     //return 0;
     printf("Test INTEGER\n");
     asn1SccMInt mint = 10;
     printf("ASN1SCC Source MInt=%llu\n", mint); 
     TVP vdm_mint;
-    Convert_MInt_from_ASN1SCC_to_VDM(vdm_mint, &mint);
-    printf("VDM Dest MInt=%d\n\n", vdm_mint);
+    Convert_MInt_from_ASN1SCC_to_VDM(&vdm_mint, &mint);
+    printf("VDM Dest MInt=%d\n\n", vdm_mint->value.intVal);
     vdm_mint = newInt(5);
     printf("VDM Source MInt=%d\n", vdm_mint->value.intVal);
     Convert_MInt_from_VDM_to_ASN1SCC(&mint, vdm_mint);
     printf("ASN1SCC Dest MInt=%llu\n\n", mint); 
-    return 0;
+
     // BOOLEAN
-    /*
     printf("Test BOOLEAN\n");
     asn1SccMBool mbool = TRUE;
     printf("ASN1SCC Source MBool=%d\n", mbool); 
@@ -64,11 +62,13 @@ int main(){
     printf("\n");
 
     TVP mseq_i_vdm;// = newSeqVar(size);
+    printf("test_b %d\n", mseq_i_vdm);
     Convert_MSeqI_from_ASN1SCC_to_VDM(&mseq_i_vdm, &mseq_i);
+    printf("test_a %d\n", mseq_i_vdm);
+    int sizet = (vdmSeqLen(mseq_i_vdm))->value.intVal;
     UNWRAP_COLLECTION(col, mseq_i_vdm);
-    sizet = (vdmSeqLen(mseq_i_vdm))->value.intVal;
-    //printf("Size new: %d\n", sizet);
-    printf("Size %d\n", col->size);
+    printf("Size new: %d\n", sizet);
+    printf("Size %d\n", sizet);
     printf("VDM Dest MSeqI\n");
     for(int i=0; i < mseq_i.nCount; i++){
         printf("%d \n", ((TVP) col->value[i])->value.intVal);   
@@ -130,11 +130,11 @@ int main(){
     asn1SccMOct moct = (asn1SccMOct){.arr = "test_str", .nCount=sizeof("test_str")};
     printf("ASN1SCC Source MOct %s\n", moct.arr);
     size = sizeof(moct.arr)/sizeof(moct.arr[0]);
-    TVP moct_vdm = newSeqVar(moct.nCount);
+    TVP moct_vdm;// = newSeqVar(moct.nCount);
     Convert_MOct_from_ASN1SCC_to_VDM(&moct_vdm, &moct);
     UNWRAP_COLLECTION(col_moct, moct_vdm);
     printf("VDM Dest MOct: ");
-    for(int i=0; i < moct.nCount; i++)
+    for(int i=0; i < col_moct->size; i++)
         printf("%c", col_moct->value[i]->value.charVal);
     printf("\n\n");
     
@@ -146,7 +146,7 @@ int main(){
     Convert_MOct_from_VDM_to_ASN1SCC(&moct, moct_vdm);
     
     printf("ASN1SCC Dest MOct %s\n", moct.arr);
-    */
+   
     // FUNCTION CALL
     
 //    DataViewCLASS test_class;

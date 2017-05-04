@@ -195,9 +195,10 @@ class FromASN1SCCtoVDM(RecursiveMapper):
         uniqueId = self.UniqueID()
         limit = sourceSequenceLimit(node, srcVar)
         lines.append("    int i%s;\n" % uniqueId)
-        lines.append("    %s = newSeqVar(%s);\n" % (dstVDMVariable, limit))
+        lines.append("    %s = newSeqVarToGrow(0, %s);\n" % (dstVDMVariable, limit))
         lines.append("    UNWRAP_COLLECTION(col, %s);" % dstVDMVariable)
-        lines.append("    for(i%s=0; i%s<%s; i%s++) {\n" % (uniqueId, uniqueId, limit, uniqueId))
+        lines.append("    col->size = %s;" %limit)
+        lines.append("    for(i%s=0; i%s<col->size; i%s++) {\n" % (uniqueId, uniqueId, uniqueId))
         lines.extend(
             ["        " + x
              for x in self.Map(
@@ -216,8 +217,11 @@ class FromASN1SCCtoVDM(RecursiveMapper):
         limit = sourceSequenceLimit(node, srcVar)
         lines.append("{\n")
         lines.append("    int i;\n")
+        lines.append("    %s = newSeqVarToGrow(0, %s);\n" % (dstVDMVariable, limit))
         lines.append("    UNWRAP_COLLECTION(col, %s);" % dstVDMVariable)
-        lines.append("    for(i=0; i<%s; i++) {\n" % limit)
+        lines.append("    col->size = %s;" %limit)
+
+        lines.append("    for(i=0; i<col->size; i++) {\n")
         lines.append("        col->value[i] = newChar((char) (%s.arr[i]));\n" % (srcVar))
         lines.append("    }\n")
         lines.append("}\n")
