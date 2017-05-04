@@ -25,18 +25,24 @@ int main(){
      */
 
     // INTEGER
+    TVP seq;
+    seq = newSeqVarToGrow(0, 4);
+    int sizet = (vdmSeqLen(seq))->value.intVal;
+    printf("%d\n", sizet);
+    //return 0;
     printf("Test INTEGER\n");
     asn1SccMInt mint = 10;
-    printf("ASN1SCC Source MInt=%d\n", mint); 
+    printf("ASN1SCC Source MInt=%llu\n", mint); 
     TVP vdm_mint;
-    Convert_MInt_from_ASN1SCC_to_VDM(&vdm_mint, &mint);
-    printf("VDM Dest MInt=%d\n\n", vdm_mint->value.intVal);
-    vdm_mint->value.intVal = 5;
+    Convert_MInt_from_ASN1SCC_to_VDM(vdm_mint, &mint);
+    printf("VDM Dest MInt=%d\n\n", vdm_mint);
+    vdm_mint = newInt(5);
     printf("VDM Source MInt=%d\n", vdm_mint->value.intVal);
     Convert_MInt_from_VDM_to_ASN1SCC(&mint, vdm_mint);
-    printf("ASN1SCC Dest MInt=%d\n\n", mint); 
-
+    printf("ASN1SCC Dest MInt=%llu\n\n", mint); 
+    return 0;
     // BOOLEAN
+    /*
     printf("Test BOOLEAN\n");
     asn1SccMBool mbool = TRUE;
     printf("ASN1SCC Source MBool=%d\n", mbool); 
@@ -51,29 +57,33 @@ int main(){
     // SEQUENCE OF INTEGER
     printf("Test SEQUENCE OF INTEGER\n");
     printf("ASN1SCC Source MSeqI\n");
-    asn1SccMSeqI mseq_i = (asn1SccMSeqI) { .arr= {1,2,3,4}, .nCount=4}; 
+    asn1SccMSeqI mseq_i = (asn1SccMSeqI) { .arr= {1,2,3,4,5}, .nCount=5}; 
     int size =  sizeof(mseq_i.arr)/sizeof(mseq_i.arr[0]);
     for(int i=0; i < size; i++)
-            printf("%d ", mseq_i.arr[i]);
+            printf("%llu ", mseq_i.arr[i]);
     printf("\n");
 
     TVP mseq_i_vdm;// = newSeqVar(size);
     Convert_MSeqI_from_ASN1SCC_to_VDM(&mseq_i_vdm, &mseq_i);
     UNWRAP_COLLECTION(col, mseq_i_vdm);
+    sizet = (vdmSeqLen(mseq_i_vdm))->value.intVal;
+    //printf("Size new: %d\n", sizet);
+    printf("Size %d\n", col->size);
     printf("VDM Dest MSeqI\n");
-    for(int i=0; i < mseq_i.nCount; i++)
-        printf("%d ", ((TVP) col->value[i])->value.intVal);   
+    for(int i=0; i < mseq_i.nCount; i++){
+        printf("%d \n", ((TVP) col->value[i])->value.intVal);   
+    }
     printf("\n");
     col->value[2]->value.intVal = 10;
     printf("VDM Source MSeqI\n");
-    for(int i=0; i < 4; i++)
+    for(int i=0; i < 5; i++)
         if (col->value[i] != NULL)
             printf("%d ", ((TVP) col->value[i])->value.intVal);   
     printf("\n");
     Convert_MSeqI_from_VDM_to_ASN1SCC(&mseq_i, &mseq_i_vdm);
     printf("ASN1SCC Dest MSeqI\n");
     for(int i = 0; i < size; i++)
-        printf("%d " , mseq_i.arr[i]);
+        printf("%llu " , mseq_i.arr[i]);
     printf("\n\n");
 
     // SEQUENCE OF BOOLEAN
@@ -82,9 +92,9 @@ int main(){
     asn1SccMSeqB mseq_b = (asn1SccMSeqB) { .arr= {TRUE, FALSE, FALSE, FALSE, TRUE}, .nCount= 5}; 
     size =  mseq_b.nCount;
     for(int i=0; i < size; i++ )
-        printf("%d ", mseq_b.arr[i]);
+        printf("%llu ", mseq_b.arr[i]);
     printf("\n");
-    TVP mseq_b_vdm;// = newSeq(size);
+    TVP mseq_b_vdm;
     Convert_MSeqB_from_ASN1SCC_to_VDM(&mseq_b_vdm, &mseq_b);
     UNWRAP_COLLECTION(col_b, mseq_b_vdm);
     printf("VDM Dest MSeqB\n");
@@ -99,7 +109,7 @@ int main(){
     Convert_MSeqB_from_VDM_to_ASN1SCC(&mseq_b, &mseq_b_vdm);
     printf("ASN1SCC Dest MSeqB\n");
     for(int i = 0; i < size; i++)
-        printf("%d " , mseq_b.arr[i]);
+        printf("%llu" , mseq_b.arr[i]);
     printf("\n\n");
 
     // ENUM
@@ -136,7 +146,7 @@ int main(){
     Convert_MOct_from_VDM_to_ASN1SCC(&moct, moct_vdm);
     
     printf("ASN1SCC Dest MOct %s\n", moct.arr);
-
+    */
     // FUNCTION CALL
     
 //    DataViewCLASS test_class;
