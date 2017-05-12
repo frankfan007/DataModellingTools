@@ -134,7 +134,8 @@ class FromVDMToASN1SCC(RecursiveMapper):
             lines.extend(
                 self.Map(
                     # "((struct * %s) (%s->value.ptr))->%s" % (type_str, srcVDMVariable, self.CleanName(child[0])),
-                    "TO_CLASS_PTR(%s, %s)->m_%s_%s" % (srcVDMVariable, type_str.replace('-', '_'), type_str.replace('-', '_'), self.CleanName(child[0])),
+                    #"TO_CLASS_PTR(%s, %s)->m_%s_%s" % (srcVDMVariable, type_str.replace('-', '_'), type_str.replace('-', '_'), self.CleanName(child[0])),
+                    "TO_RECORD_PTR(%s, %s)->m_%s_%s" % (srcVDMVariable, type_str.replace('-', '_'), type_str.replace('-', '_'), self.CleanName(child[0])),
                     destVar + "." + self.CleanName(child[0]),
                     child[1],
                     leafTypeDict,

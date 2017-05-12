@@ -71,7 +71,7 @@ int main(){
     printf("Size %d\n", sizet);
     printf("VDM Dest MSeqI\n");
     for(int i=0; i < mseq_i.nCount; i++){
-        printf("%d \n", ((TVP) col->value[i])->value.intVal);   
+        printf("%d ", ((TVP) col->value[i])->value.intVal);   
     }
     printf("\n");
     col->value[2]->value.intVal = 10;
@@ -144,9 +144,20 @@ int main(){
         printf("%c", col_moct->value[i]->value.charVal);
     printf("\n");
     Convert_MOct_from_VDM_to_ASN1SCC(&moct, moct_vdm);
-    
     printf("ASN1SCC Dest MOct %s\n", moct.arr);
-   
+    printf("\n\n");
+
+    // RECORDs TYPE
+    TSeqCLASS c;
+	TVP temp = _Z4TSeqEII(c,  newInt(50),newInt(20));
+    TSeqCLASS x = TO_RECORD_PTR(temp, TSeq);
+    printf("VDM Source TSeq\n");
+    printf("Component1 %d\n", (x->m_TSeq_component1)->value.intVal);
+    printf("Component2 %d\n", (x->m_TSeq_component2)->value.intVal);
+    asn1SccTSeq tseq_dest;
+    Convert_TSeq_from_VDM_to_ASN1SCC(&tseq_dest, &temp);
+    printf("ASN1SCC Component1 %d\n", tseq_dest.component1);
+    printf("ASN1SCC Component2 %d\n", tseq_dest.component2);
     // FUNCTION CALL
     
 //    DataViewCLASS test_class;
