@@ -280,9 +280,6 @@ class VDM_GlueGenerator(ASynchronousToolGlueGenerator):
         self.FromVDMToASN1SCC = FromVDMToASN1SCC()
         self.FromASN1SCCtoVDM = FromASN1SCCtoVDM()
 
-    def Version(self) -> None:
-        print("Code generator: " + "$Id: vdm_B_mapper.py 2390 2015-07-04 12:39:17Z tfabbri $")
-
     def HeadersOnStartup(self, unused_asnFile: str, unused_outputDir: str, unused_maybeFVname: str) -> None:
         # Constant includes
         self.C_HeaderFile.write("#include <assert.h>\n")
@@ -315,6 +312,7 @@ class VDM_GlueGenerator(ASynchronousToolGlueGenerator):
         # Write the mapping code for the message
         if self.useOSS:
             print('useOSS')
+            lines = []
             # lines = self.FromRTDSToOSS.Map(
             #    "(%sVDM)" % ("*" if isPointer else ""),
             #    "(*ptrASN1SCC)",
@@ -349,6 +347,7 @@ class VDM_GlueGenerator(ASynchronousToolGlueGenerator):
 
         if self.useOSS:
             print('useOSS')
+            lines = []
         #    lines = self.FromOSStoRTDS.Map(
         #        "(*ptrASN1SCC)",
         #        "(*ptrVDM)",

@@ -2,7 +2,7 @@ include common.mk
 
 VPATH=..:../dmt/A_mappers:../dmt/commonPy
 
-PYSRC_A := ada_A_mapper.py c_A_mapper.py og_A_mapper.py simulink_A_mapper.py python_A_mapper.py scade6_A_mapper.py smp2_A_mapper.py sqlalchemy_A_mapper.py rtds_A_mapper.py qgenada_A_mapper.py qgenc_A_mapper.py
+PYSRC_A := ada_A_mapper.py c_A_mapper.py og_A_mapper.py simulink_A_mapper.py python_A_mapper.py scade6_A_mapper.py smp2_A_mapper.py sqlalchemy_A_mapper.py rtds_A_mapper.py qgenada_A_mapper.py qgenc_A_mapper.py vdm_A_mapper.py
 PYSRC_A_COVER := $(PYSRC_A:%.py=___dmt_A_mappers_%.py,cover)
 
 # Python3.5 includes an older version of typing, which by default has priority over
@@ -23,6 +23,7 @@ ___dmt_A_mappers_%.py,cover:	../A_mappers/%.py DataTypesSimulink.asn
 	LANG=C LC_ALL=C python3 -m coverage run -a -m dmt.asn2dataModel 2>/dev/null || echo -n
 	LANG=C LC_ALL=C python3 -m coverage run -a -m dmt.asn2dataModel -o output 2>/dev/null || echo -n
 	LANG=C LC_ALL=C python3 -m coverage run -a -m dmt.asn2dataModel -o output -toRTDS DataTypesSimulink.asn >/dev/null
+	LANG=C LC_ALL=C python3 -m coverage run -a -m dmt.asn2dataModel -o output -toVdm DataTypesSimulink.asn >/dev/null
 	LANG=C LC_ALL=C python3 -m coverage run -a -m dmt.asn2dataModel -o output -toQGenAda DataTypesSimulink.asn >/dev/null
 	LANG=C LC_ALL=C python3 -m coverage run -a -m dmt.asn2dataModel -o output -toQGenC DataTypesSimulink.asn >/dev/null
 	LANG=C LC_ALL=C python3 -m coverage run -a -m dmt.asn2dataModel -o output -verbose -toSIMULINK DataTypesSimulink.asn >/dev/null

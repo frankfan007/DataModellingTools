@@ -37,10 +37,10 @@ def OnStartup(unused_modelingLanguage: str, asnFile: Union[str, List[str]], outp
         asn1SccPath, asn1SccFolder, outputDir)
     if isinstance(asnFile, str):
         cmd += asnFile + "\""
-    else:
-        cmd += "\" \"".join(asnFile) + "\""
+    else: # pragma: no cover
+        cmd += "\" \"".join(asnFile) + "\"" # pragma: no cover
     if os.system(cmd) != 0:
-        panic("ASN1SCC failed...")
+        panic("ASN1SCC failed...") # pragma: no cover
     else:
         print("Generated:", os.path.realpath("\"{}\"/out.vdm".format(outputDir)).replace('/"./"/', ''))
 

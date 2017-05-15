@@ -31,6 +31,12 @@ PROPERTIES
 	Source_Language => Ada;
 END mytestsubsystemEmpty.Ada;
 
+SUBPROGRAM IMPLEMENTATION mytestsubsystemEmpty.Vdm
+PROPERTIES
+	FV_Name => "mytestsubsystemEmpty_fv_Vdm";
+	Source_Language => Vdm;
+END mytestsubsystemEmpty.Ada;
+
 SUBPROGRAM IMPLEMENTATION mytestsubsystemEmpty.Scade
 PROPERTIES
 	FV_Name => "mytestsubsystemEmpty_fv_Scade";
@@ -143,6 +149,13 @@ PROPERTIES
 	FV_Name => "mytestsubsystem_fv_Ada";
 	Source_Language => Ada;
 END mytestsubsystem.Ada;
+
+SUBPROGRAM IMPLEMENTATION mytestsubsystem.Vdm
+PROPERTIES
+	FV_Name => "mytestsubsystem_fv_Vdm";
+	Source_Language => Vdm;
+END mytestsubsystem.Ada;
+
 
 SUBPROGRAM IMPLEMENTATION mytestsubsystem.Scade
 PROPERTIES
