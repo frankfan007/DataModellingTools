@@ -134,7 +134,7 @@ class FromVDMToASN1SCC(RecursiveMapper):
             lines.extend(
                 self.Map(
                     # "((struct * %s) (%s->value.ptr))->%s" % (type_str, srcVDMVariable, self.CleanName(child[0])),
-                    #"TO_CLASS_PTR(%s, %s)->m_%s_%s" % (srcVDMVariable, type_str.replace('-', '_'), type_str.replace('-', '_'), self.CleanName(child[0])),
+                    # "TO_CLASS_PTR(%s, %s)->m_%s_%s" % (srcVDMVariable, type_str.replace('-', '_'), type_str.replace('-', '_'), self.CleanName(child[0])),
                     "TO_RECORD_PTR(%s, %s)->m_%s_%s" % (srcVDMVariable, type_str.replace('-', '_'), type_str.replace('-', '_'), self.CleanName(child[0])),
                     destVar + "." + self.CleanName(child[0]),
                     child[1],
@@ -162,10 +162,6 @@ class FromVDMToASN1SCC(RecursiveMapper):
             lines.append("    %s.kind = %s;\n" % (destVar, self.CleanName(child[2])))
             lines.append("}\n")
         return lines
-'''
-    def MapSetOf(self, unused_srcSDLVariable, unused_destVar, node, unused_leafTypeDict, unused_names):
-        panic("The PragmaDev mapper does not support SETOF. Please use SEQUENCEOF instead (%s)" % node.Location())  # pragma: nocover
-'''
 
 
 # noinspection PyListCreation
@@ -276,10 +272,6 @@ class FromASN1SCCtoVDM(RecursiveMapper):
                      names)])
             lines.append("}\n")
         return lines
-'''
-    def MapSetOf(self, unused_srcVar, unused_dstSDLVariable, node, unused_leafTypeDict, unused_names):
-        panic("The PragmaDev mapper does not support SETOF. Please use SEQUENCEOF instead (%s)" % node.Location())  # pragma: nocover
-'''
 
 
 class VDM_GlueGenerator(ASynchronousToolGlueGenerator):
