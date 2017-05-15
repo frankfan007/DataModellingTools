@@ -243,6 +243,8 @@ class FromASN1SCCtoVDM(RecursiveMapper):
         for key in names:
             if names[key] == node:
                 type_str = key  # type: str
+
+        lines.append("{} = _Z{}{}EV(NULL);".format(dstVDMVariable, len(type_str), type_str.replace('-', '_')))
         for child in node._members:
             lines.extend(
                 self.Map(

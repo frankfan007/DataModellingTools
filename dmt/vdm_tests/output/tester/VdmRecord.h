@@ -38,7 +38,7 @@ typedef void (*freeVdmRecordFunction)(void*);
 #define ASSERT_CHECK_RECORD(s) assert(s->type == VDM_RECORD && "Value is not a record")
 #define RECORD_FIELD_ACCESS(record,recordType,field,var) TVP var = NULL;{ASSERT_CHECK_RECORD(record);UNWRAP_RECORD(ar,record);var=vdmClone(((recordType)ar)->field);}
 #define RECORD_FIELD_SET(record,recordType,field,value) {ASSERT_CHECK_RECORD(record);UNWRAP_RECORD(ar,record);((recordType)ar)->field=vdmClone(value);}
-#define TO_RECORD_PTR(tv, type) ((struct type *) ( ((struct RecordType*)tv->value.ptr))->value)
+#define TO_RECORD_PTR(tv, type) ((struct type *) (((struct RecordType*)tv->value.ptr))->value)
 
 #ifndef NO_RECORDS
 

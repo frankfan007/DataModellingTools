@@ -1,3 +1,4 @@
+#define ASN1SCC_MAPPING
 #include "../tester/Vdm_ASN1_Types.h"
 
 int main(){
@@ -149,8 +150,11 @@ int main(){
 
     // RECORDs TYPE
     TSeqCLASS c;
-	TVP temp = _Z4TSeqEII(c,  newInt(50),newInt(20));
+//TVP temp = _Z4TSeqEII(c,  newInt(50),newInt(20));
+    TVP temp = _Z4TSeqEV(NULL);
     TSeqCLASS x = TO_RECORD_PTR(temp, TSeq);
+    x->m_TSeq_component1 = newInt(10);
+    x->m_TSeq_component2 = newInt(30);
     printf("VDM Source TSeq\n");
     printf("Component1 %d\n", (x->m_TSeq_component1)->value.intVal);
     printf("Component2 %d\n", (x->m_TSeq_component2)->value.intVal);
@@ -158,7 +162,12 @@ int main(){
     Convert_TSeq_from_VDM_to_ASN1SCC(&tseq_dest, &temp);
     printf("ASN1SCC Component1 %d\n", tseq_dest.component1);
     printf("ASN1SCC Component2 %d\n", tseq_dest.component2);
-    // FUNCTION CALL
+    tseq_dest.component1 = 30;
+    tseq_dest.component2 = 50;
+    TVP temp2;
+    Convert_TSeq_from_ASN1SCC_to_VDM(&temp2, &tseq_dest);
+    printf("Component1 %d\n", (TO_RECORD_PTR(temp2, TSeq)->m_TSeq_component1)->value.intVal);
+    printf("Component2 %d\n", (TO_RECORD_PTR(temp2, TSeq)->m_TSeq_component2)->value.intVal);
     
 //    DataViewCLASS test_class;
 //    TVP vdm_mint_ret = _Z7vdm5funEI(test_class, vdm_mint);
