@@ -11,7 +11,7 @@ This script is developed for being executed as standalone script (it downloads a
 Use the following commands to download it and configure your machine:
 
 ```
-$ wget https://raw/githubusercontent.com/tfabbri/DataModellingTools/vdm-b-mapper/dmt/vdm_tests/INSTALL.sh
+$ wget https://raw.githubusercontent.com/tfabbri/DataModellingTools/vdm-b-mapper/dmt/vdm_tests/INSTALL.sh
 $ chmod +x INSTALL.sh
 $ ./INSTALL.sh
 ```
