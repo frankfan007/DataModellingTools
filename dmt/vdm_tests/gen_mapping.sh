@@ -31,7 +31,7 @@ elif [[ ! -d $output_dir ]]; then
     echo "$output_dir already exists but is not a directory" 1>&2
 fi
 
-echo "input_file=$input_file, output_file='$output_dir', Leftovers: $@"
+echo "input_file=$input_file, output_dir='$output_dir', Leftovers: $@"
 
 echo "Generation of piece of code required..."
 asn2aadlPlus  $input_file  DataView.aadl
