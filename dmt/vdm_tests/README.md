@@ -6,6 +6,15 @@ VDM Test directory
 - vdm-tests.aadl Simple AADL architecture to test the VDM B_mapper, now this file can be generated through the script `asn2aadlVDM` part of DataModellingTools installation
 - output/tester Directory containing the VDM2C Native Library and testing code
 
+Added the installation script for configure your machine and install all the components required (included ASN.1 compiler). This script has been tested on Ubunt 16.04 LTS.  
+This script is developed for being executed as standalone script (it downloads also the DataModellingTools repository); it is not required to clone this repository. 
+Use the following commands to download it and configure your machine:
+
+```
+$ wget https://raw/githubusercontent.com/tfabbri/DataModellingTools/vdm-b-mapper/dmt/vdm_tests/INSTALL.sh
+$ chmod +x INSTALL.sh
+$ ./INSTALL.sh
+```
 
 Run the code generation:
 

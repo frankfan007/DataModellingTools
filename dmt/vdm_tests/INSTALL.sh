@@ -23,7 +23,7 @@ sudo apt-get install libxslt1-dev libxml2-dev zlib1g-dev python3-pip git python-
 sudo apt-get install mono-devel fsharp antlr
 git clone https://github.com/ttsiodras/asn1scc
 cd asn1scc 
-#xbuild /p:TargetFrameworkVersion="v4.5"
+xbuild /p:TargetFrameworkVersion="v4.5"
 mv "$(pwd)/Asn1f2/bin/Debug/Asn1f2.exe" "$(pwd)/Asn1f2/bin/Debug/asn1.exe"
 pathadd "$(pwd)/Asn1f2/bin/Debug"  
 echo 'export VDM_STG=$(pwd)/Asn1f2/Debug/bin/vdm.stg' >> ~/.profile
