@@ -34,6 +34,8 @@ fi
 echo "input_file=$input_file, output_dir='$output_dir', Leftovers: $@"
 
 echo "Generation of piece of code required..."
+
+source $HOME/.profile
 asn2aadlPlus  $input_file  DataView.aadl
 asn2aadlVDM   $input_file  vdm_temp_architeture.aadl
 aadl2glueC -o $output_dir  vdm_temp_architeture.aadl DataView.aadl

@@ -1,32 +1,37 @@
 #!/bin/bash
-
-if [ -e ${HOME}/.profile ]; then 
-    touch "${HOME}/.profile"
-fi
-
-
 # Utility function 
-
 pathadd() {
-    echo "Adding $1 to PATH"
     if [ -d "$1" ] && [[ ":$PATH" != *":$1:"* ]]; then
-        echo "Added $1 to PATH"
-        #$PATH="${PATH:+"$PATH:"}$1"
         echo 'export PATH=$PATH:'${1} >> $HOME/.profile
     fi
 }
 
 # Dependencies
-sudo apt-get install libxslt1-dev libxml2-dev zlib1g-dev python3-pip git python-antlr
+BASHRC=".bashrc"
+
+if [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then 
+    if [ -e ${HOME}/.profile ]; then 
+        touch "${HOME}/.profile"
+    fi
+    sudo apt-get install libxslt1-dev libxml2-dev zlib1g-dev python3-pip git python-antlr
+    sudo apt-get install mono-devel fsharp antlr
+elif [ "$(uname)" == "Darwin" ]; then
+    BASHRC=".bash_profile"
+    brew update
+    brew upgrade
+    brew install libxslt python python3 lzlib binutils libantlr3c wget
+    wget -O -q https://github.com/ttsiodras/DataModellingTools/files/335591/antlr-2.7.7.tar.gz | targ -zxvf
+    cd antlr-2.7.7/lib/python 
+    pip2 install .
+fi
 
 # ASN.1 compiler 
-sudo apt-get install mono-devel fsharp antlr
 git clone https://github.com/ttsiodras/asn1scc
 cd asn1scc 
 xbuild /p:TargetFrameworkVersion="v4.5"
 mv "$(pwd)/Asn1f2/bin/Debug/Asn1f2.exe" "$(pwd)/Asn1f2/bin/Debug/asn1.exe"
 pathadd "$(pwd)/Asn1f2/bin/Debug"  
-echo 'export VDM_STG=$(pwd)/Asn1f2/Debug/bin/vdm.stg' >> ~/.profile
+echo 'export VDM_STG=$(pwd)/Asn1f2/Debug/bin/vdm.stg' >> $HOME/.profile
 cd ../
 
 # VDM-mapper repository clone
@@ -37,8 +42,7 @@ pathadd "${HOME}/.local/bin"
 pathadd "$(pwd)/dmt/vdm_tests/"
 cd ../
 
-if grep -q "source .profile" $HOME/.bashrc; then 
-    echo 'source .profile' >> ~/.bashrc
+if grep -q "source .profile" $HOME/$BASHRC; then 
+    echo 'source .profile' >> $HOME/$BASHRC
 fi
-
 echo "Restart your shell to complete the installation" 
