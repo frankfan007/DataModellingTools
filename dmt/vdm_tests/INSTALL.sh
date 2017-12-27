@@ -1,5 +1,6 @@
-#!/bin/bash
+#/bin/bash
 # Utility function 
+
 pathadd() {
     if [ -d "$1" ] && [[ ":$PATH" != *":$1:"* ]]; then
         echo 'export PATH=$PATH:'${1} >> $HOME/$BASHRC
@@ -9,20 +10,20 @@ pathadd() {
 OPTIND=1
 install_dir=""
 
-
-while getopts "h?vf:" opt; do
+while getopts ":d:h" opt; do
     case "$opt" in
-    h|\?)
+    h)
         echo "Installation of mapping functions support"
         exit 0
         ;;
-    f)  INSTALL_DIR=$OPTARG
+    d) 
+	echo "${OPTARG}"
+        INSTALL_DIR=${OPTARG}
         ;;
     esac
 done
 
-shift $((OPTIND-1))
-[ "$1" = "--" ] && shift
+shift "$((OPTIND-1))"
 
 if [ ! "${INSTALL_DIR}" ]
 then
@@ -30,7 +31,7 @@ then
     exit 1
 fi
 
-echo "INSTALL_DIR=${install_dir}" 
+echo "INSTALL_DIR=${INSTALL_DIR}" 
 
 BASHRC=".bashrc"
 cd ${INSTALL_DIR}
@@ -42,20 +43,26 @@ if [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     fi
     sudo apt-get update
     sudo apt-get install mono-devel fsharp antlr
-    sudo apt-get install libxslt1-dev libxml2-dev zlib1g-dev python3-pip git python-antlr
-    wget -O -q https://github.com/ttsiodras/DataModellingTools/files/335591/antlr-2.7.7.tar.gz | targ -zxvf
+    sudo apt-get install libxslt1-dev libxml2-dev zlib1g-dev python3-pip git python-antlr python-pip
+    wget https://github.com/ttsiodras/DataModellingTools/files/335591/antlr-2.7.7.tar.gz 
+    tar -zxvf antlr-2.7.7.tar.gz
     cd antlr-2.7.7/lib/python 
-    sudo pip2 install .
+    sudo pip install .
+    cd ../../..
 
 elif [ "$(uname)" == "Darwin" ]; then
     BASHRC=".bash_profile"
     brew update
     brew upgrade
     brew install libxslt python python3 lzlib binutils libantlr3c wget
-    wget -O -q https://github.com/ttsiodras/DataModellingTools/files/335591/antlr-2.7.7.tar.gz | targ -zxvf
+    wget https://github.com/ttsiodras/DataModellingTools/files/335591/antlr-2.7.7.tar.gz 
+    tar -zxvf antlr-2.7.7.tar.gz
     cd antlr-2.7.7/lib/python 
     sudo pip2 install .
+    cd ../../..
 fi
+
+
 
 # ASN.1 compiler 
 git clone https://github.com/ttsiodras/asn1scc
@@ -76,4 +83,4 @@ pathadd "${HOME}/.local/bin"
 pathadd "${PWD}/dmt/vdm_tests/"
 cd ../
 
-echo "Restart your shell to complete the installation"
+echo "Restart your shell to complete the installation" 
